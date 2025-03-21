@@ -1,0 +1,58 @@
+---
+title: "Testing the Cooperative Eye Hypothesis by construction of a biomimetic eye tracking device"
+author: "M Schmettow, C. Willemse, S. Borsci"
+format: html
+editor: visual
+---
+
+## Introduction
+
+The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour. Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera. The first argument in this paper is that under the CEH it is very likely that the eye ball evolves into a form that is *computationally efficient*. The ability to establish shared attention may have also played a role in child rearing, which implies that a *reciprocal cognitive ability to read glance direction* has evolved alongside.
+
+Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a *biomimetic device* to read glance directions should be easy to develop. In the contrary, prevalent eye tracking technology uses corneal reflections to estimate glance direction, which is not biomimetic.
+
+Our first argument is that, under the CEH, effective eye tracking must be possible using only such visual information that would be available to a human observer. We present a candidate biomimetic QuadBright algorithm (QBA), which uses the brightness distribution of the image and simple statistical learning to establish eye tracking. Using a prototype, we evaluate the accuracy of the eye tracking device and compare it to the accuracy of common human observers.
+
+Our follow-up question is whether human glance processing is a specialized cognitive ability that evolved in reciprocity with eye ball structure . In the second experiment participants have to judge the glance direction of faces, but in one condition the eye regions have been degraded to contain only visual information available to the candidate algorithm. If human performance is unhindered by the degrading, it can be concluded, that glance perception is based on similar information.
+
+### Eye tracking
+
+#### Perception of glance directions
+
+The stare-in-the-crowd phenomenon shows that human glance perception is accurate even over a distance of several meters. An eye region of 40mm horizontally in 3 meter distance has a perceived visual angle of around 45 arc min. If we further assume an angular range of displayed glances of 4500 arc min (75 degree) and foveal resolution of 1 arc min on the receiving end, the *theoretical* resolution limit for glance direction is approximately 100 arc min (1.7 degree). Compared to that, the horizontal visual angle of the receivers face is 300 arc min.
+
+If the we assume that the senders corneal reflections span 6 arc min on the receiving end, the same calculation produces a resolution limit of 900 arc min (15 degree). It is immediately clear that corneal reflections are not biomimetic, as they cannot work over a distance.
+
+#### Eye tracking methods
+
+#### QuadBright and YET
+
+Prevalent algorithms in eye tracking instruments use information unavailable to human visual perception, which comes as a mild surprise under the Cooperative Eye Hypothesis. The Quadbright method emerged from a quest into low-cost eye tracking instruments for educational purposes. The primary requirement was that hardware costs may not be more than a study book, which forbade any high resolution cameras. It also had to be quite flexible in placement of the camera and not require much fine adjustment.
+
+As a camera the choice fell on a type of commercially available USB endoscope. These cameras with a diameter of 5.5mm create almost no obstruction when mounted in the visual field and the built-in LED lights provide a stable light source for better accuracy. On the downside these devices deliver a poor resolution of 480x320 and use unspecified electronic components.
+
+The QuadBright method is derived from the observation, that eye movements produce a change in spatial brightness distribution by the moving iris. A simple way to characterize the brightness distribution along the vertical and horizontal axes is to partition the image in four quadrants and average across pixel brightness. By further exploration it quickly turned out that the change in brightness is almost linearly related to eye ball position in a wide range.
+
+Essentially, QuadBright reduces every frame to four brightness pixel (NE, SE, SW, NW). During calibration, QB measures are produced with the true location available $y_i$ . This data is send to a regression engine using a multiple linear regression model. This is done separately for x and y directions. The model is trained on the calibration data and then used to predict eye ball position in real time.
+
+$$
+y_i = \beta_0 + \beta_1 x_{NE} + \beta_2 x_{SE} + \beta_3 x_{SW} + \beta_4 x_{NW}
+$$
+
+## Results
+
+### Accuracy of the QuadBright algorithm
+
+### Human performance with degraded eye regions
+
+## Discussion
+
+### The Reciprocal Cooperative Eye theory
+
+Can a man say with certainty that a woman in 3m distance is looking at him and not the leopard in the tree behind him? The theoretical limits we calculated suggest that everyday human glance perception is operating at the limits of the visual system. Even if the eye ball has evolved into the perfect sender for glance direction signals, it is more likely that specialized cognitive functions have evolved on the receiving end.
+
+### Future research
+
+Our search for a candidate biomimetic algorithm was short and successful. Other algorithms may exist and should be explored. Furthermore, the experiment confirms biomimesis of QB only insofar as human processing can perform with the same information. A stronger test for biomimesis is to create situations, where QB is likely to fail, for example, when strong reflections distort the perceived brightness distribution, or when the eye is highly asymmetric. Also, QB ignores any curvature, which produces biases in extreme eyeball positions. If the device is biomimetic, similar biases should be observable.
+
+### Conclusion

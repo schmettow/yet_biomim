@@ -1,0 +1,610 @@
+---
+title: "YET_2605_Vis"
+author: "FBender"
+date: "2024-05-26"
+output:
+  word_document: default
+---
+
+# Loading libraries
+```{r}
+library(tidyverse)
+library(rstanarm)
+library(bayr)
+library(ggplot2)
+library(ggforce)
+library(tidyr)
+library(dplyr)
+```
+
+# Reading and merging Data
+```{r}
+# List all CSV files in the directory
+csv_files <- list.files(path = "C:/Datanew", pattern = "*.csv", full.names = TRUE)
+
+# Read each CSV file into a data frame and store in a list
+experiment_list <- csv_files %>%
+  map(~ read_csv(.x) %>% as_tbl_obs())
+
+# Combine all data frames into one data frame
+Experiment <- bind_rows(experiment_list)
+
+# Read Stimuli and Conditions data
+Stimuli <- read_csv("C:/Users/fbend/Downloads/YET-main/YET-main/yeta/1 - Kopie/Stimuli/Stimuli.csv") %>% as_tbl_obs()
+Conditions <- read_csv("C:/Users/fbend/Downloads/YET-main/YET-main/yeta/1 - Kopie/Conditions.csv") %>% as_tbl_obs()
+
+# Merge Experiment data with Stimuli data
+merged_data <- Experiment %>%
+  left_join(Stimuli, by = c("Stim" = "File"))
+
+# Merge the resulting data with Conditions data
+final_data <- merged_data %>%
+  left_join(Conditions, by = c("Part" = "Trial"))
+```
+Setting Screen parameters
+```{r}
+# Screen parameters
+screen_diag_cm <- 40.64
+screen_res_x <- 1920
+screen_res_y <- 1080
+viewing_distance_cm <- 45
+
+# Calculate screen dimensions
+aspect_ratio <- 16 / 9
+screen_width_cm <- screen_diag_cm * (16 / sqrt(16^2 + 9^2))   
+screen_height_cm <- screen_diag_cm * (9 / sqrt(16^2 + 9^2))
+
+# Define the center of the screen
+screen_center_x <- screen_res_x / 2
+screen_center_y <- screen_res_y / 2
+```
+
+
+```{r}
+# convert radians to degrees (atan)
+rad2deg <- function(rad) {
+  rad * (180 / pi)
+}
+
+# Function to calculate distance between two points in pixels
+calculate_distance_px <- function(x1, y1, x2, y2) {
+  sqrt((x2 - x1)^2 + (y2 - y1)^2)
+}
+
+
+# Function to calculate visual angle relative to the center of the screen
+calculate_visual_angle_center <- function(x, y, center_x, center_y, screen_width_cm, screen_height_cm, screen_res_x, screen_res_y, viewing_distance_cm) {
+  delta_x <- x - center_x
+  delta_y <- y - center_y
+  pixel_size_cm <- screen_width_cm / screen_res_x  
+  
+  angle_x <- rad2deg(2 * atan((delta_x * pixel_size_cm) / (2 * viewing_distance_cm)))       # calculates the horizontal visual angle (in degrees) of a gaze point relative to the center of the screen, based on its distance from the center, the pixel size, and the viewing distance
+  angle_y <- rad2deg(2 * atan((delta_y * pixel_size_cm) / (2 * viewing_distance_cm)))       #  calculates the vertical visual angle (in degrees) of a gaze point relative to the center of the screen, based on its distance from the center, the pixel size, and the viewing distance
+  
+  return(list(angle_x, angle_y))
+}
+
+# Adding visual angle to the data
+final_data <- final_data %>%
+  mutate(
+    angles = map2(x.x, y.x, ~calculate_visual_angle_center(.x, .y, screen_center_x, screen_center_y, screen_width_cm, screen_height_cm, screen_res_x, screen_res_y, viewing_distance_cm)),
+    visual_angle_x = map_dbl(angles, 1),
+    visual_angle_y = map_dbl(angles, 2)
+  ) %>%
+  select(-angles)  # Remove the intermediate column
+
+# Function to calculate visual angle from distance in pixels
+calculate_visual_angle_distance <- function(distance_px, screen_width_cm, screen_res_x, viewing_distance_cm) {
+  pixel_size_cm <- screen_width_cm / screen_res_x  
+  distance_cm <- distance_px * pixel_size_cm
+  visual_angle <- rad2deg(2 * atan((distance_cm / 2) / viewing_distance_cm))
+  return(visual_angle)
+}
+
+# Perform mutation on the entire data using rowwise()
+final_data <- final_data %>%
+  rowwise() %>%
+  mutate(
+    distance_px = calculate_distance_px(x.x, y.x, x.y, y.y),
+    visual_angle_accuracy = calculate_visual_angle_distance(distance_px, screen_width_cm, screen_res_x, viewing_distance_cm)
+  )
+```
+
+
+# table with mean, median, and std for visual angle accuracy (in degrees)
+```{r}
+###### table with mean, median, and std for visual angle accuracy (in degrees)
+##### C1 = IR, C2 = EC_L1, C3 = EC_L0
+##### B1 = congruentBG(white), B2 = incongruentBG(black)
+
+# Calculate required statistics including the background
+stats <- final_data %>%
+  group_by(Participant, Condition, background) %>%
+  summarise(
+    mean = mean(visual_angle_accuracy, na.rm = TRUE),
+    median = median(visual_angle_accuracy, na.rm = TRUE),
+    std = sd(visual_angle_accuracy, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Reshape data to wide format with separate columns for each background
+stats_wide <- stats %>%
+  pivot_wider(
+    names_from = c(Condition, background),
+    values_from = c(mean, median, std),
+    names_glue = "C{Condition}_B{background}_{.value}"
+  )
+
+# Reorganize columns
+final_table <- stats_wide %>%
+  select(
+    Participant,
+    C1_B1_mean, C1_B1_median, C1_B1_std,
+    C1_B2_mean, C1_B2_median, C1_B2_std,
+    C2_B1_mean, C2_B1_median, C2_B1_std,
+    C2_B2_mean, C2_B2_median, C2_B2_std,
+    C3_B1_mean, C3_B1_median, C3_B1_std,
+    C3_B2_mean, C3_B2_median, C3_B2_std
+  )
+```
+
+
+```{r}
+##### same table, only for background 1 
+
+# Filter for background 1
+stats_background1 <- stats %>%
+  filter(background == 1)
+
+# Reorganize columns
+final_table_b1 <- stats_wide %>%
+  select(
+    Participant,
+    C1_B1_mean, C1_B1_median, C1_B1_std,
+    C2_B1_mean, C2_B1_median, C2_B1_std,
+    C3_B1_mean, C3_B1_median, C3_B1_std
+  )
+```
+
+```{r}
+##### table for background 1 excluding the outer stimuli on the left and right side (A1-4, F1-4)
+
+# Stimuli to exclude
+excluded_stimuli <- c(
+  "24grid_WhiteA1.png", "24grid_WhiteA2.png", "24grid_WhiteA3.png", "24grid_WhiteA4.png",
+  "24grid_WhiteF1.png", "24grid_WhiteF2.png", "24grid_WhiteF3.png", "24grid_WhiteF4.png"
+)
+
+# Calculate required statistics excluding excluded stimuli and including the background
+stats <- final_data %>%
+  filter(!Stim %in% excluded_stimuli) %>% # Exclude specific stimuli
+  group_by(Participant, Condition, background) %>%
+  summarise(
+    mean = mean(visual_angle_accuracy, na.rm = TRUE),
+    median = median(visual_angle_accuracy, na.rm = TRUE),
+    std = sd(visual_angle_accuracy, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Filter for background 1
+stats_background1 <- stats %>%
+  filter(background == 1)
+
+# Reshape data to wide format with separate columns for each condition
+stats_wide <- stats_background1 %>%
+  pivot_wider(
+    names_from = Condition,
+    values_from = c(mean, median, std),
+    names_glue = "C{Condition}_{.value}"
+  )
+
+# Reorganize columns
+final_table_b1_exclAF <- stats_wide %>%
+  select(
+    Participant,
+    C1_mean, C1_median, C1_std,
+    C2_mean, C2_median, C2_std,
+    C3_mean, C3_median, C3_std
+  )
+```
+
+```{r}
+#### table for background 1 now excluding all stimuli except for the 4 in the center
+
+# Stimuli to exclude
+excluded_stimuli <- c(
+  "24grid_WhiteA1.png", "24grid_WhiteA2.png", "24grid_WhiteA3.png", "24grid_WhiteA4.png",
+  "24grid_WhiteF1.png", "24grid_WhiteF2.png", "24grid_WhiteF3.png", "24grid_WhiteF4.png",
+  "24grid_WhiteB1.png", "24grid_WhiteB2.png", "24grid_WhiteB3.png", "24grid_WhiteB4.png",
+  "24grid_WhiteE1.png", "24grid_WhiteE2.png", "24grid_WhiteE3.png", "24grid_WhiteE4.png",
+  "24grid_WhiteC1.png", "24grid_WhiteC4.png", 
+  "24grid_WhiteD1.png", "24grid_WhiteD4.png"
+)
+
+# Calculate required statistics excluding excluded stimuli and including the background
+stats <- final_data %>%
+  filter(!Stim %in% excluded_stimuli) %>% # Exclude specific stimuli
+  group_by(Participant, Condition, background) %>%
+  summarise(
+    mean = mean(visual_angle_accuracy, na.rm = TRUE),
+    median = median(visual_angle_accuracy, na.rm = TRUE),
+    std = sd(visual_angle_accuracy, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Filter for background 1
+stats_background1 <- stats %>%
+  filter(background == 1)
+
+# Reshape data to wide format with separate columns for each condition
+stats_wide <- stats_background1 %>%
+  pivot_wider(
+    names_from = Condition,
+    values_from = c(mean, median, std),
+    names_glue = "C{Condition}_{.value}"
+  )
+
+# Reorganize columns
+final_table_b1_center4 <- stats_wide %>%
+  select(
+    Participant,
+    C1_mean, C1_median, C1_std,
+    C2_mean, C2_median, C2_std,
+    C3_mean, C3_median, C3_std
+  )
+```
+# table with mean, median, and std for visual angle accuracy (in degrees)
+## C1 = IR, C2 = EC_L1, C3 = EC_L0
+## B1 = congruentBG(white), B2 = incongruentBG(black)
+```{r}
+print(final_table)
+```
+# same table, only for background 1
+```{r}
+print(final_table_b1)
+```
+# table for background 1 excluding the outer stimuli on the left and right side (A1-4, F1-4)
+```{r}
+print(final_table_b1_exclAF)
+```
+# table for background 1 now excluding all stimuli except for the 4 in the center
+```{r}
+print(final_table_b1_center4)
+```
+
+
+
+
+# Boxplots Mean and SD of Visual Angle Accuracy by Condition and Background 
+```{r}
+###### Meand and SD of Visual Angle Accuracy by Condition and Background 
+
+# Group the data by condition and background
+grouped_data <- final_data %>%
+  group_by(Condition, background) %>%
+  summarize(
+    mean_visual_angle_accuracy = mean(visual_angle_accuracy, na.rm = TRUE),
+    sd_visual_angle_accuracy = sd(visual_angle_accuracy, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Print the summarized data
+print(grouped_data)
+
+ggplot(grouped_data, aes(x = factor(Condition), y = mean_visual_angle_accuracy, fill = factor(background))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_visual_angle_accuracy - sd_visual_angle_accuracy, ymax = mean_visual_angle_accuracy + sd_visual_angle_accuracy), 
+                position = position_dodge(width = 0.9), width = 0.25) +
+  labs(title = "Mean and SD of Visual Angle Accuracy by Condition and Background",
+       x = "Condition",
+       y = "Mean Visual Angle Accuracy (in degrees)",
+       fill = "Background") +
+  theme_minimal()
+```
+
+# Mean and SD for Visual Angle Accuracy by Condition for congruent Background (1, white)
+```{r}
+###### Mean and SD for Visual Angle Accuracy by Condition for congruent Background (1, white)
+###### Plots are arranged in the same order as the Stimuli shown on screen
+
+# Group the data by condition, background, and Stim
+grouped_data2 <- final_data %>%
+  group_by(Condition, background, Stim) %>%
+  summarize(
+    mean_visual_angle_accuracy = mean(visual_angle_accuracy, na.rm = TRUE),
+    sd_visual_angle_accuracy = sd(visual_angle_accuracy, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Print the summarized data
+print(grouped_data2)
+
+# Filter the data to include only background 1
+filtered_data <- grouped_data2 %>%
+  filter(background == 1)
+
+# Extract the number from the Stim names and create a new column
+filtered_data <- filtered_data %>%
+  mutate(Stim_number = as.numeric(str_extract(Stim, "\\d+(?=\\.png)")))
+
+# Reorder the Stim variable based on the extracted number
+filtered_data <- filtered_data %>%
+  mutate(Stim = fct_reorder(Stim, Stim_number))
+
+###### Mean and SD for Visual Angle Accuracy by Condition for congruent Background (1, white)
+###### Plots are arranged in the same order as the Stimuli shown on screen
+ggplot(filtered_data, aes(x = factor(Condition), y = mean_visual_angle_accuracy, fill = factor(background))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_visual_angle_accuracy - sd_visual_angle_accuracy, ymax = mean_visual_angle_accuracy + sd_visual_angle_accuracy), 
+                position = position_dodge(width = 0.9), width = 0.25) +
+  labs(title = "Mean and SD of Visual Angle Accuracy by Condition for congruent Background (1. white)",
+       x = "Condition",
+       y = "Mean Visual Angle Accuracy") +
+  theme_minimal() +
+  guides(fill = FALSE) +
+  facet_wrap(~ Stim, nrow = 4)
+
+```
+
+# inverted scatterplot showing stimulus positions and collected gaze points
+```{r}
+###### inverted scatterplot showing stimulus positions and collected gaze points for each background (inverted without affecting)
+###### since 0,0 is in the upper left corner of the screen, I subtracted the screen height for the coordinates (without the stimuli and gaze points would be shown upside down)
+
+
+create_scatterplot <- function(data, bg_value, screen_res_y) {
+  plot_data <- data %>%
+    mutate(y.x_plot = screen_res_y - y.x, 
+           y.y_plot = screen_res_y - y.y)
+  
+  ggplot(data = plot_data, aes(x = x.y, y = y.y_plot)) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 1), aes(x = x.x, y = y.x_plot, color = "Condition 1"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 2), aes(x = x.x, y = y.x_plot, color = "Condition 2"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 3), aes(x = x.x, y = y.x_plot, color = "Condition 3"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value), aes(color = "Stimulus"), size = 3, alpha = 0.5) +
+    scale_color_manual(name = "Points", values = c("Stimulus" = "black", "Condition 1" = "red", "Condition 2" = "blue", "Condition 3" = "green")) +
+    labs(title = paste("Scatterplot for background =", bg_value),
+         x = "X Coordinate", y = "Y Coordinate") +
+    theme_minimal()
+}
+```
+# inverted scatterplot showing stimulus positions and collected gaze points (bg1)
+```{r}
+# Scatterplot for background = 1
+scatterplot_bg1 <- create_scatterplot(data = final_data, bg_value = 1, screen_res_y = screen_res_y)
+print(scatterplot_bg1)
+```
+# inverted scatterplot showing stimulus positions and collected gaze points (bg2)
+```{r}
+# Scatterplot for background = 2
+scatterplot_bg2 <- create_scatterplot(data = final_data, bg_value = 2, screen_res_y = screen_res_y)
+print(scatterplot_bg2)
+```
+
+
+```{r}
+############ Scatterplots for each participant
+
+# Function to create scatterplot
+create_scatterplot2 <- function(data, bg_value, screen_res_y) {
+  plot_data <- data %>%
+    mutate(y.x_plot = screen_res_y - y.x, 
+           y.y_plot = screen_res_y - y.y)
+  
+  ggplot(data = plot_data, aes(x = x.y, y = y.y_plot)) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 1), aes(x = x.x, y = y.x_plot, color = "Condition 1"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 2), aes(x = x.x, y = y.x_plot, color = "Condition 2"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value & Condition == 3), aes(x = x.x, y = y.x_plot, color = "Condition 3"), size = 1) +
+    geom_point(data = filter(plot_data, background == bg_value), aes(color = "Stimulus"), size = 3, alpha = 0.5) +
+    scale_color_manual(name = "Points", values = c("Stimulus" = "black", "Condition 1" = "red", "Condition 2" = "blue", "Condition 3" = "green")) +
+    labs(title = paste("Scatterplot for background =", bg_value),
+         x = "X Coordinate", y = "Y Coordinate") +
+    theme_minimal() +
+    facet_wrap(~ Participant)  # Facet by Participant
+}
+```
+
+```{r}
+# Scatterplot for background = 1 with facets for each participant
+scatterplot2_bg1 <- create_scatterplot2(data = final_data, bg_value = 1, screen_res_y = screen_res_y)
+print(scatterplot2_bg1)
+```
+
+```{r}
+# Scatterplot for background = 2 with facets for each participant
+scatterplot2_bg2 <- create_scatterplot2(data = final_data, bg_value = 2, screen_res_y = screen_res_y)
+print(scatterplot2_bg2)
+```
+
+
+# Stim positions with mean euclidian distance circles around them 
+```{r}
+####### Stim positions with mean euclidian distance circles around them 
+
+# Function to calculate Euclidean distance between two points in pixels
+calculate_euclidean_distance <- function(x1, y1, x2, y2) {
+  distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+  return(distance)
+}
+
+# Perform mutation on the entire data using rowwise()
+final_data <- final_data %>%
+  rowwise() %>%
+  mutate(
+    euclidean_distance = calculate_euclidean_distance(x.x, y.x, x.y, y.y)
+  )
+
+# Group the data by both Stim and Condition
+final_data_G <- final_data %>%
+  group_by(Stim, Condition) %>%
+  # Calculate the mean Euclidean distance per stimulus per condition
+  mutate(mean_euclidean_distance_per_stimulus_per_condition = mean(euclidean_distance)) %>%
+  ungroup()  # Remove grouping
+
+# Create a new dataframe for plotting with adjusted y-coordinates
+plot_data <- final_data_G %>%
+  mutate(
+    y.x_plot = screen_res_y - y.x,
+    y.y_plot = screen_res_y - y.y
+  )
+
+# Filter data for background 1 for plotting
+plot_data_bg1 <- plot_data %>%
+  filter(background == 1)
+
+# Create the plot
+ggplot(plot_data_bg1, aes(x = x.y, y = y.y_plot)) +
+  geom_point(color = "black") +  # Black dots for stimulus positions
+  geom_circle(data = plot_data_bg1 %>% filter(Condition == 1), aes(x0 = x.y, y0 = y.y_plot, r = mean_euclidean_distance_per_stimulus_per_condition, color = factor(Condition)), show.legend = TRUE, fill = NA, linewidth = 1.5) +  # Circles for condition 1
+  geom_circle(data = plot_data_bg1 %>% filter(Condition == 2), aes(x0 = x.y, y0 = y.y_plot, r = mean_euclidean_distance_per_stimulus_per_condition, color = factor(Condition)), show.legend = TRUE, fill = NA, linewidth = 1.5) +  # Circles for condition 2
+  geom_circle(data = plot_data_bg1 %>% filter(Condition == 3), aes(x0 = x.y, y0 = y.y_plot, r = mean_euclidean_distance_per_stimulus_per_condition, color = factor(Condition)), show.legend = TRUE, fill = NA, linewidth = 1.5) +  # Circles for condition 3
+  scale_color_manual(name = "Condition", values = c("1" = "red", "2" = "blue", "3" = "green"), labels = c("Condition 1-IR", "Condition 2-EC_L1", "Condition 3-EC_L0")) +
+  labs(x = "X Coordinate", y = "Y Coordinate", title = "Stimulus Positions with Mean Euclidean Distance Circles by Condition") +
+  theme_minimal()
+```
+
+# Visual Angle Accuracy for horizontal and vertical shift
+```{r}
+########## Visual Angle Accuracy for horizontal and vertical shift
+
+# Visual Angle Accuracy for horizontal shift (x) as points
+ggplot(final_data, aes(x = visual_angle_x, y = visual_angle_accuracy, color = factor(background))) +
+  geom_point() +
+  labs(title = "Visual Angle Accuracy by Horizontal shift (x)",
+       x = "Viewing Angle Horizontal (X)",
+       y = "Visual Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+
+
+# Visual Angle Accuracy for horizontal shift (x) as curves
+ggplot(final_data, aes(x = visual_angle_x, y = visual_angle_accuracy, color = factor(background))) +
+  geom_smooth(method = "loess", se = FALSE) +  # Fit a smooth curve
+  labs(title = "Visual Angle Accuracy by Horizontal shift (x)",
+       x = "Viewing Angle Horizontal (X)",
+       y = "Visual Angle Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+
+
+# Visual Angle Accuracy for vertical shift (y) as points
+ggplot(final_data, aes(x = visual_angle_y, y = visual_angle_accuracy, color = factor(background))) +
+  geom_point() +
+  labs(title = "Visual Angle Accuracy by vertical shift (y)",
+       x = "Viewing Angle Vertical (Y)",
+       y = "Visual Angle Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+
+
+# Visual Angle Accuracy for vertical shift (y) as curves
+ggplot(final_data, aes(x = visual_angle_y, y = visual_angle_accuracy, color = factor(background))) +
+  geom_smooth(method = "loess", se = FALSE) +  # Fit a smooth curve
+  labs(title = "Visual Angle Accuracy by vertical shift (y)",
+       x = "Viewing Angle Vertical (Y)",
+       y = "Visual Angle Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+```
+
+```{r}
+
+########## Combined curves by increase of X (solid) or Y (dashed)
+
+# Plot for increase in x.x and y.x combined
+ggplot(final_data, aes(color = factor(background))) +
+  geom_smooth(aes(x = visual_angle_x, y = visual_angle_accuracy), method = "loess", se = FALSE) +
+  geom_smooth(aes(x = visual_angle_y, y = visual_angle_accuracy), method = "loess", se = FALSE, linetype = "dashed") +
+  labs(title = "Visual Angle Accuracy by Increase of X or Y",
+       x = "Viewing Angle",
+       y = "Visual Angle Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+
+```
+
+```{r}
+
+######### filtering the first 10 rows for every Stim for each Trial (Part)
+######### by excluding the first 10 observations for every stim in every trial, the rise at the center (0°) falls
+######### this shows that the rise in the center is related to the initial recordings where the participant is still looking at the center where the recalibration point was located
+
+# Filter out the first 10 rows for each Part and Stim
+filtered_data <- final_data %>%
+  group_by(Part, Stim) %>%
+  slice(-(1:10)) %>%
+  ungroup()
+
+# Plot for increase in x.x and y.x combined
+ggplot(filtered_data, aes(color = factor(background))) +
+  geom_smooth(aes(x = visual_angle_x, y = visual_angle_accuracy), method = "loess", se = FALSE) +
+  geom_smooth(aes(x = visual_angle_y, y = visual_angle_accuracy), method = "loess", se = FALSE, linetype = "dashed") +
+  labs(title = "Visual Angle Accuracy by Increase of X or Y",
+       x = "Viewing Angle",
+       y = "Visual Angle Accuracy",
+       color = "Background") +
+  theme_minimal() +
+  facet_grid(background ~ Condition, scales = "free_y")
+```
+
+
+# Model
+# stan_glmer(visual_angle_accuracy ~ background * Condition + 
+#    (background * Condition | Participant) + 
+#    (Condition | Stim))
+```{r}
+# Fit the mixed-effects model with the specified interactions and random effects
+model <- stan_glmer(
+  visual_angle_accuracy ~ background * Condition + 
+    (background * Condition | Participant) + 
+    (Condition | Stim),
+  data = final_data,
+  family = gaussian(), 
+  chains = 4,          
+  cores = parallel::detectCores(), # Use all available cores
+  iter = 100           
+)
+
+# Summarize the model
+summary(model)
+
+# Extract and plot the fixed effects
+plot(model, pars = c("background", "Condition", "background:Condition"))
+
+# Check the model diagnostics
+posterior_interval(model, prob = 0.95)
+```
+
+
+
+# Model2
+# same as before, for filtered data (- first 10 observations)
+```{r}
+# Fit the mixed-effects model with the specified interactions and random effects
+model <- stan_glmer(
+  visual_angle_accuracy ~ background * Condition + 
+    (background * Condition | Participant) + 
+    (Condition | Stim),
+  data = filtered_data,
+  family = gaussian(), 
+  chains = 4,          
+  cores = parallel::detectCores(), # Use all available cores
+  iter = 100           
+)
+
+# Summarize the model
+summary(model)
+
+# Extract and plot the fixed effects
+plot(model, pars = c("background", "Condition", "background:Condition"))
+
+# Check the model diagnostics
+posterior_interval(model, prob = 0.95)
+```
+
+

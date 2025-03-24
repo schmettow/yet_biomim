@@ -9,8 +9,6 @@ output:
 # Loading libraries
 ```{r}
 library(tidyverse)
-library(rstanarm)
-library(bayr)
 library(ggplot2)
 library(ggforce)
 library(tidyr)
@@ -20,18 +18,37 @@ library(dplyr)
 # Reading and merging Data
 ```{r}
 # List all CSV files in the directory
-csv_files <- list.files(path = "C:/Datanew", pattern = "*.csv", full.names = TRUE)
+csv_files <- list.files(path = "Data", pattern = "*.csv", full.names = TRUE)
+
+yet_coltypes <- cols(
+  Part = col_double(),
+  Stim = col_character(),
+  time = col_double(),
+  x = col_double(),
+  y = col_double(),
+  x_pro = col_double(),
+  y_pro = col_double(),
+)
+
+read_yet <- function(file) {
+  read_csv(file, col_types = yet_coltypes)
+}
 
 # Read each CSV file into a data frame and store in a list
-experiment_list <- csv_files %>%
-  map(~ read_csv(.x) %>% as_tbl_obs())
+experiment_list <- 
+  csv_files %>%
+  map(~ read_yet(.x))
 
 # Combine all data frames into one data frame
 Experiment <- bind_rows(experiment_list)
 
 # Read Stimuli and Conditions data
-Stimuli <- read_csv("C:/Users/fbend/Downloads/YET-main/YET-main/yeta/1 - Kopie/Stimuli/Stimuli.csv") %>% as_tbl_obs()
-Conditions <- read_csv("C:/Users/fbend/Downloads/YET-main/YET-main/yeta/1 - Kopie/Conditions.csv") %>% as_tbl_obs()
+Stimuli <- 
+  read_csv("AccuracyExperiment/Stimuli/Stimuli.csv") |> 
+  rename(target_x = x, target_y = y)
+  
+  
+Conditions <- read_csv("AccuracyExperiment/Conditions.csv")
 
 # Merge Experiment data with Stimuli data
 merged_data <- Experiment %>%
@@ -87,7 +104,7 @@ calculate_visual_angle_center <- function(x, y, center_x, center_y, screen_width
 # Adding visual angle to the data
 final_data <- final_data %>%
   mutate(
-    angles = map2(x.x, y.x, ~calculate_visual_angle_center(.x, .y, screen_center_x, screen_center_y, screen_width_cm, screen_height_cm, screen_res_x, screen_res_y, viewing_distance_cm)),
+    angles = map2(x, y, ~calculate_visual_angle_center(.x, .y, screen_center_x, screen_center_y, screen_width_cm, screen_height_cm, screen_res_x, screen_res_y, viewing_distance_cm)),
     visual_angle_x = map_dbl(angles, 1),
     visual_angle_y = map_dbl(angles, 2)
   ) %>%
@@ -105,10 +122,14 @@ calculate_visual_angle_distance <- function(distance_px, screen_width_cm, screen
 final_data <- final_data %>%
   rowwise() %>%
   mutate(
-    distance_px = calculate_distance_px(x.x, y.x, x.y, y.y),
+    distance_px = calculate_distance_px(x, y, target_x, target_y),
     visual_angle_accuracy = calculate_visual_angle_distance(distance_px, screen_width_cm, screen_res_x, viewing_distance_cm)
   )
+
+save(final_data, file = "FB24.rda")
 ```
+
+
 
 
 # table with mean, median, and std for visual angle accuracy (in degrees)

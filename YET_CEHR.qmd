@@ -7,11 +7,11 @@ editor: visual
 
 ## Introduction
 
-The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour. Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera. The first argument in this paper is that under the CEH it is very likely that the eye ball evolves into a form that is *computationally efficient*. The ability to establish shared attention may have also played a role in child rearing, which suggests that a *reciprocal* innate ability to read glance direction\* has evolved alongside.
+The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour. Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera. The first argument in this paper is that under the CEH it is very likely that the eye ball evolves into a form that is *computationally efficient*. The ability to establish shared attention by glance perception may have also played a role in child rearing, which suggests that a *reciprocal* innate ability to read glance direction may have evolved alongside.
 
-Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a *biomimetic* device to read glance directions should be easy to develop, if we cognitive mechanism is known. Our first argument is that, under the CEH, effective eye tracking must be possible using only visual information that also is available to a human receiver. In contrast, recent eye tracking technology often relies on corneal reflections, which is not what humans usually see and thus not biomimetic.
+Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a *biomimetic* device to read glance directions should be easy to construct, if just the cognitive mechanism was known. Under the CEH, effective eye tracking must be possible using only visual information that also is available to a human receiver. In contrast, recent eye tracking technology often relies on corneal reflections, which is not what humans usually see and thus not cannot be biomimetic.
 
-The problem with building a biomimetic eye tracker is that a precise cognitive model of glance perception is not available. However, it is possible to build an eye tracker, that can be called *bioconvergent*, in that it works only with information available also to human receivers. In this paper we present a bioconvergent method to eyetracking. The *QuadBright* method uses the brightness distribution of the image and simple statistical learning to establish eye tracking. Using a prototype, we evaluate the accuracy of the eye tracking device and compare it to the accuracy of common human observers.
+The problem with building a biomimetic eye tracker is that a precise cognitive model of glance perception is not available. However, it is possible to build an eye tracker, that can be called *bioconvergent*, in that it may work differently in detail, but only with information available also to human receivers. In this paper we present a bioconvergent method to eyetracking. The *QuadBright* method uses the brightness distribution of the image and simple statistical learning to establish eye tracking. Using a prototype, we evaluate the accuracy of the eye tracking device and compare it to the accuracy of common human observers.
 
 Once a bioconvergent eye tracking device is established, it is possible to test an extended version of the CEH, which states that human glance perception is an innate cognitive ability that evolved in reciprocity with eye ball structure. In the experiment, we measure participants glance direction performance, when they only saw the information available to the QuadBright algorithm. If human performance is unhindered by the degrading, it can be concluded, that underlying computation is similar.
 
@@ -24,19 +24,19 @@ If the eye ball has evolved to send strong signals as the CEH states, then it mu
 -   uses only information available to a human receiver
 -   is computationally efficient
 
-The first aim of this work is to develop a bio-convergent eye tracking device, which uses visible light and has similar characteristics as human glance perception.
+The first aim of this work is to develop a bio-convergent eye tracking device, which uses visible light only and has similar characteristics as human glance perception.
 
 ### Theoretical limits of glance perception
 
-The stare-in-the-crowd phenomenon shows that human glance perception is accurate even over a distance of several meters. An eye region of 40mm horizontally in 3 meter distance has a perceived visual angle of around 45 arc min. If we further assume an angular range of displayed glances of 4500 arc min (75 degree) and foveal resolution of 1 arc min on the receiving end, the *theoretical* resolution limit for glance direction is approximately 100 arc min (1.7 degree). Compared to that, the horizontal visual angle of the receivers face is 300 arc min.
+The stare-in-the-crowd phenomenon shows that human glance perception is accurate even over a distance of several meters. An eye region of 40mm horizontally in 3 meter distance has a perceived visual angle of around 45 arc min. If we further take the mobility of the eye ball to span 4500 arc min (75 degree) and foveal resolution of 1 arc min on the receiving end, the *theoretical* resolution limit for glance direction is approximately 100 arc min (1.7 degree). Compared to that, the horizontal visual angle of the receivers face is 300 arc min.
 
-If the we assume that the senders corneal reflections span 6 arc min on the receiving end, the same calculation produces a resolution limit of 900 arc min (15 degree). It is immediately clear that corneal reflections are not biomimetic, as they cannot work over a distance.
+Under the same circumstances, the senders corneal reflections span 6 arc min on the receiving end and the same calculation produces a resolution limit of 900 arc min (15 degree). It is immediately clear that corneal reflections are not biomimetic, as this would never allow glance perception at a distance.
 
 ## QuadBright: A bioconvergent eye tracking method
 
 The QuadBright method is derived from the observation, that eye movements produce a change in spatial *brightness distribution* by the moving iris. Another idea during the design was that in frontal projection, the human eye is almost symmetric in the horizontal and vertical axis. The human visual system is strongly tuned to detect *symmetry*, as is documented by the Gestalt law. From an algorithmic point, symmetry operations are memory efficient and fast to compute. Lastly, computational efficiency can only be claimed if the algorithm uses simple operations and few parameters. Finally, glance perception usually happens from a more or less *frontal perspective*.
 
-First, QuadBright fulfills these requirements by drastically degrading the input signal. Every frame is split in four quadrants NE, SE, SW and NW and *four average brightness* and reduced to average brightness. During calibration, average quadrant brightness measures are produced with the true location $y_i$ available. This data is send to a regression engine using a multiple linear regression model. This is done separately for x and y directions, not using any conditional terms. The model is trained on the calibration data and then used to predict eye ball position in real time.
+First, QuadBright fulfills these requirements by drastically degrading the input signal. Every frame is split in four quadrants NE, SE, SW and NW and is reduced to average brightness. During calibration, average quadrant brightness measures are produced with the true location $y_i$ available. This data is send to a regression engine using a multiple linear regression model. This is done separately for x and y directions, not using any conditional terms. The model is trained on the calibration data and then used to predict eye ball position in real time.
 
 $$
 y_i = \beta_0 + \beta_1 x_\textrm{NE} + \beta_2 x_\textrm{SE} + \beta_3 x_\textrm{SW} + \beta_4 x_\textrm{NW}
@@ -44,11 +44,11 @@ $$
 
 ### YET Zero prototype
 
-Given that QuadBright essentially compresses the input into a four pixel frame, a high resolution camera was not necessary. More important was a small footprint, as it had to be mounted in frontal position.
+Given that QuadBright essentially compresses the input into a four pixel frame, a high resolution camera is not necessary. More important is a small footprint, as it had to be mounted in frontal position. The choice fell on a type of commercially available USB endoscope cameras. These cameras with a diameter of 5.5mm create almost no obstruction when mounted in the visual field and the built-in LED lights provide a stable light source for better accuracy. On the downside these devices deliver a poor resolution of 480x320 and use unspecified electronic components. A simple 3D-printed part was created to be able to glue the camera to a stick, which in turn is connected to a head mount.
 
-As a camera the choice fell on a type of commercially available USB endoscope. These cameras with a diameter of 5.5mm create almost no obstruction when mounted in the visual field and the built-in LED lights provide a stable light source for better accuracy. On the downside these devices deliver a poor resolution of 480x320 and use unspecified electronic components. A simple 3D-printed part was created to be able to glue the camera to a stick, which in turn is connected to a head mount.
+The YET Zero application was written in Python, using OpenCV for image processing and PyGame for the GUI. The regression model was implemented using the scikit-learn library. First the user is asked to adjust the camera position to be approximately centered. An eye detection algorithm marks the eye region as input for quadrant brightness. During calibration, nine points are shown to the participant and quadrant brightness is used to train the regression model, which provides real time eye positions estimates. To compensate for minor drifts, every stimulus is preceded by a quick calibration routine, which only records the center point to apply horizontal and vertical translations.
 
-The YET Zero application was written in Python, using OpenCV for image processing and PyGame for the GUI. The regression model was implemented using the scikit-learn library. First the user is asked to adjust the camera position to be approximately centered. An eye detection algorithm marks the eye region as input for quadrant brightness. During full calibration, nine points are shown to the participant and quadrant brightness is used to train the regression model. During the presentation of visual stimuli this model provides the eye positions in real time. To compensate for minor drifts, every stimulus is preceded by a quick calibration routine, which only records the center point to apply horizontal and vertical translations. When testing the system, it was was noted that the change in brightness between the calibration white screen and the stimuli can introduce biases. To compensate, quick calibration was augmented with a highly degraded preview of the next stimulus.
+This system already worked well, but it turned out that changes in computer screen brightness effects can introduce estimation biases. For compensation, the quick calibration step was augmented with a highly degraded preview of the next stimulus, just enough to keep the brightness stable between quick calibration and stimulus presentation.
 
 ## Results
 
@@ -98,10 +98,7 @@ FB_24 |>
   
 ```
 
-
 ### Human performance with Quadbright information
-
-
 
 ## Discussion
 

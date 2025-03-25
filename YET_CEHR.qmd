@@ -158,7 +158,8 @@ FB24_1 |>
     geom_density()
 
 ```
-Figure ((XY)) shows the angular error as a distribution across all trials. Accuracy is best in the center region with a median of 1.3 - 1.4 degree accuracy. The error increases towards the edges of the screen, but asymmetrically. To the mount side the median error is 2.6 - 3.7 degree, but 5 - 5.5 degrees to the inner side of the eye. In all positions, errors larger than 10 degree were extremely rare. We can conclude that the QuadBright algorithm is able to estimate eye ball positions reasonably accurate and robust.
+
+Figure ((XY)) shows the distribution of angular errors per target position across all trials. Accuracy is best in the center region with a median of 1.3 - 1.4 degree accuracy. The error increases towards the edges of the screen, but asymmetrically. To the mount side the median error is 2.6 - 3.7 degree, but 5 - 5.5 degrees to the inner side of the eye. In all positions, errors larger than 10 degree were extremely rare. We can conclude that the QuadBright algorithm is able to estimate eye ball positions reasonably accurate and robust.
 
 
 ### Human performance with Quadbright information

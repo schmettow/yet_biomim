@@ -52,9 +52,21 @@ This system already worked well, but it turned out that changes in computer scre
 
 ## Results
 
-### Accuracy of the QuadBright algorithm
+## Study 1: Accuracy of the QuadBright algorithm
 
-```{r echo = F}
+The first study was conducted to measure the accuracy of the Quadbright algorithm, with the expectation that it matchges human performance.
+In the experiment participants were asked to follow a target, while the QuadBright algorithm tracked their eye positions. Accuracy was measured by calculating the angular accuracy of the predicted positions.
+
+### Design and Sample
+
+The first study was conducted to evaluate the accuracy of the QuadBright algorithm. The algorithm was tested on a set of 36 participants, who were asked to find and focus an orange target on a white background, moving in a random pattern between 24 positions. 
+
+The experiment was carried out with Yet Zero. The headmount was constructed from an old headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials, each lasting 3 seconds. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular standard error of predicted eye movements of the participants. 
+
+The original experiment tested various lighting conditions (LED, IR, no light), as well as the before-mentioned bias due to changing screen brightness levels ((FB24)). The latter was confirmed to such an extent that the results were discarded. The three levels of lighting conditions differed so little that for the analysis here data was pooled.
+
+
+```{r echo = F, output = F}
 library(tidyverse)
 load("FB/FB24.rda")
 
@@ -62,7 +74,7 @@ load("FB/FB24.rda")
 t_offset <- min(final_data$Part)
 n_sessions <- 6
 
-FB24 <-
+FB24_0 <-
   final_data |> 
   ungroup() |>
   mutate(BG = str_extract(Stim, "White|Black"),
@@ -76,27 +88,103 @@ FB24 <-
          time = time - t_offset - start_time) |> 
   ## Finding trials
   group_by(Part, Session, Target, BG) |> 
-  mutate(lag = time - lag(time),
-         new_trial = if_else(lag > 0.5, T, NA),
-         Trial = fill_down(cumsum(new_trial))) |>
-  filter(BG == "White") |> 
-  select(Run, Part, Session, start_time, Target, repetition, target_x, target_y, time, BG, x, y, 
-         x_pro, y_pro, visual_angle_x:visual_angle_accuracy)
-  
-FB24 |> 
-  group_by(Part, Session, Target, BG) |> 
-  summarize(N = n()) |> 
-  ungroup() |>
-  summarize(n_frames_avg = mean(N),
-            n_frames_sd = sd(N)) |>
-  knitr::kable()
+  mutate(new_trial = Stim != lag(Stim, default = "_0"),
+         Rep = cumsum(new_trial) - 1) |>
+  fill(Rep) |> 
+  ungroup() |> 
+  group_by(Part) |> 
+  mutate(trial = cumsum(new_trial)) |> 
+  ungroup() |> 
+  group_by(Part, trial) |>
+  mutate(time = time - min(time)) |> 
+  ungroup() |> 
+  select(Run, Part, Session, trial, start_time, Rep, Target, target_x, target_y, time, BG, x, y, x_pro, y_pro, visual_angle_x:visual_angle_accuracy)
+
+summary(FB24_0)
+
+FB24_0 |> 
+  ggplot(aes(x = time, y = visual_angle_accuracy, col = as.factor(Session))) +
+  geom_smooth(se = F) +
+  facet_wrap(~Part) +
+  theme_minimal()
+
+## only using middle second
+FB24 <- 
+  FB24_0 |> 
+  filter(BG == "White" & time > 1 & time < 2)
 ```
 
-```{r}
-FB_24 |> 
-  ggplot(aes(x = ))
-  
+
+```{r eval = F, echo = F}
+FB24 |> 
+  group_by(Part, Session) |>
+  summarize(`mean angular error` = mean(visual_angle_accuracy)) |> 
+  ggplot(aes(x = Session, y = `mean angular error`, group = as.factor(Part))) + geom_line()
+
 ```
+
+```{r fig.height=10, eval = F, echo = F}
+FB24 |> 
+  group_by(Part, target_x, target_y, Session) |> 
+  summarize(mean_error = mean(visual_angle_accuracy)) |> 
+  ungroup() |> 
+  ggplot(aes(color = as.factor(Session), x = mean_error)) +
+  geom_density() +
+  facet_grid(target_y ~ target_x) +
+  scale_x_log10()
+
+```
+
+
+```{r}
+FB24_1 <- 
+  FB24 |> 
+    group_by(Part, target_x, target_y, trial) |> 
+    summarize(accuracy = mean(visual_angle_accuracy)) |> 
+    ungroup()
+
+FB24_1 |> 
+  group_by(target_x, target_y) |>
+  summarize(mean_error = mean(accuracy), sd_error = sd(accuracy), median = median(accuracy))
+```
+
+
+Figure ((XZ)) shows the distribution of angular errors combined (on $\log_{10}$ scale). The median accuracy is 2.8 degree, with a mean of 3.2 degree. 95 percent of all errors are below 8.5 degree. The accuracy is best in the center region with a median of 1.3 - 1.4 degree accuracy. The error increases towards the edges of the screen, but asymmetrically. To the mount side the median error is 2.6 - 3.7 degree, but 5 - 5.5 degrees to the inner side of the eye. In all positions, errors larger than 10 degree were extremely rare. We can conclude that the QuadBright algorithm is able to estimate eye ball positions reasonably accurate and robust under different light conditions. The few catastrophes mostly occurred on three (out of 36) participants, for which the calibration didn't seem to work reliably.
+
+
+```{r}
+T_0 <- 
+  FB24_1 |> 
+  summarize(mean(accuracy), median(accuracy), quantile(accuracy, .95))
+  
+
+FB24_1 |> 
+  filter(accuracy < 20) |> 
+  ggplot(aes(x = accuracy)) +
+#    facet_grid(target_y ~ target_x) +
+  scale_x_log10() +
+  geom_histogram() +
+  geom_vline(aes(xintercept = median(accuracy), col = "median")) +
+  geom_vline(aes(xintercept = mean(accuracy), col = "mean")) +
+  geom_vline(aes(xintercept = quantile(accuracy,.95), col = "95% quant."))
+  
+
+```
+
+
+```{r fig.width = 12, fig.height = 10}
+
+
+ FB24_1 |> 
+    filter(accuracy < 20) |> 
+    ggplot(aes(x = accuracy)) +
+    facet_grid(target_y ~ target_x) +
+    geom_density()
+
+```
+
+Figure ((XY)) shows the distribution of angular errors per target position across all trials. Accuracy is best in the center region with a median of 1.3 - 1.4 degree accuracy. The error increases towards the edges of the screen, but asymmetrically. To the mount side the median error is 2.6 - 3.7 degree, but 5 - 5.5 degrees to the inner side of the eye. In all positions, errors larger than 10 degree were extremely rare. We can conclude that the QuadBright algorithm is able to estimate eye ball positions reasonably accurate and robust under different light conditions. The few catastrophes mostly occurred on three (out of 36) participants, for which the calibration didn't seem to work reliably.
+
 
 ### Human performance with Quadbright information
 
@@ -104,9 +192,24 @@ FB_24 |>
 
 The Cooperative Eye Hypothesis states that the eyeball has evolved to be
 
+### Performance
+
+
+
+### Signal efficiency
+
+Social signalling devices evolve in reciprocity, as many examples from animal sexual and caregiving behaviour show. In human evolution, caregivers evolved an urge to smile at infants, which in turn evolved to see smiles ((REF)). Modern communication has reduced human smiling to its geometric core. Two dots and an arc can make a baby happy.
+Evolution does not have the power to simultaneously evolve new pairs of senders and a receivers. 
+Absence of certain pigments is a common type of genetic disorder. Also, pigmentation consumes energy, which made XY(19xx) conclude that the advantage of pigmentation in the sclera yields is *deception*. It is easy to imagine how a white sclera spontaneously appears, but what made it stay? From the reciprocity condition follows that the initial signal must have matched with existing cognitive structures in the receiver. 
+
+Simple signals have a higher chance of hitting on existing structures. The fact that an eye tracking device only needs four pixel, 10 parameters and the four arithmetic operations to work, proves that the human eyeball is sending a simple and clear signal.
+
+
 ### The Reciprocal Cooperative Eye theory
 
 How can a woman say with certainty that a man in 3m distance is looking at her and not at the leopard in the tree behind her? The theoretical limits we calculated suggest that everyday human glance perception is operating at the limits of the visual system. Even if the eye ball has evolved into the perfect sender for glance direction signals, it is likely that specialized cognitive functions have evolved on the receiving end.
+
+Our second experiment showed that human glance perception is barely affected by pixelized eyes. This suggests that the underlying cognitive mechanism is similar to the QuadBright algorithm.
 
 ### Future research
 

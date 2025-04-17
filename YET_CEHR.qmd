@@ -1,5 +1,5 @@
 ---
-title: "Testing the Cooperative Eye Hypothesis by bioconvergent eye tracking"
+title: "The Receiving End of the Cooperative Eye Hypothesis"
 author: "M Schmettow, C. Willemse, S. Borsci"
 format: html
 editor: visual
@@ -9,34 +9,67 @@ editor: visual
 
 The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour. Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera. The first argument in this paper is that under the CEH it is very likely that the eye ball evolves into a form that is *computationally efficient*. The ability to establish shared attention by glance perception may have also played a role in child rearing, which suggests that a *reciprocal* innate ability to read glance direction may have evolved alongside.
 
-Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a *biomimetic* device to read glance directions should be easy to construct, if just the cognitive mechanism was known. Under the CEH, effective eye tracking must be possible using only visual information that also is available to a human receiver. In contrast, recent eye tracking technology often relies on corneal reflections, which is not what humans usually see and thus not cannot be biomimetic.
+Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a device to read glance directions should be easy to construct, if just the cognitive mechanism was known. Under the CEH, effective eye tracking must be possible using only visual information that also is available to a human receiver. In contrast, recent eye tracking technology often relies on corneal reflections, which is not what humans usually see and thus not cannot be biomimetic.
 
 The problem with building a biomimetic eye tracker is that a precise cognitive model of glance perception is not available. However, it is possible to build an eye tracker, that can be called *bioconvergent*, in that it may work differently in detail, but only with information available also to human receivers. In this paper we present a bioconvergent method to eyetracking. The *QuadBright* method uses the brightness distribution of the image and simple statistical learning to establish eye tracking. Using a prototype, we evaluate the accuracy of the eye tracking device and compare it to the accuracy of common human observers.
 
 Once a bioconvergent eye tracking device is established, it is possible to test an extended version of the CEH, which states that human glance perception is an innate cognitive ability that evolved in reciprocity with eye ball structure. In the experiment, we measure participants glance direction performance, when they only saw the information available to the QuadBright algorithm. If human performance is unhindered by the degrading, it can be concluded, that underlying computation is similar.
 
-### The Cooperative Eye Hypothesis
+### The Cooperative Eye Hypothesis (CEH)
 
-### Bio-convergent Eye Tracking
+In fact, all animal scleras are white, which is occluded by a layer of pigmentation in the conjunctiva. As KK note, sustaining pigmentation costs the organism energy. From a biophysical perspective it takes a very precise molecular configuration to produce exact colors. The biosynthetic pathways of melanin are complex and several mutations are known, such as albinism, and bright iris color  (Eiberg et al., 2008). Non fatal single-point mutations are possible and could have benefits for th eorganism, the real question therefore seems to be: why have Great Apes and many other animals dark scleras? 
 
-If the eye ball has evolved to send strong signals as the CEH states, then it must be possible to build an eye tracking device that
+One explanation is that protection against predators. Since the eyeball is an optical device in the first place, a pupil is dark almost inevitable. In its default state, the animal eye is a high-contrast target, that is also rapidly moving in the case of Great Apes, and the conjunctiva pigmentation may have evolved as camouflage (KK). Another hypothesis is that within-species competition is the driving force for dark scleras in the Great Apes.
 
--   uses only information available to a human receiver
--   is computationally efficient
 
-The first aim of this work is to develop a bio-convergent eye tracking device, which uses visible light only and has similar characteristics as human glance perception.
+### Origins of Glance Reading
 
-### Theoretical limits of glance perception
+The possibility of a single-point mutation producing a white sclera surely exists and examples of innate social signals between animals exist, too, for example in wolves direct staring is a signal of challenge, or when cats narrow their eyes in a "smile". Essentially, the CEH states that the human eye has evolved to be a signalling device. However, all within-species and even some between-species signalling devices can only evolve, when there is a *reciprocal cognitive mechanism to receive* the signal. 
+The main question in this paper is: What was on the receiving end, when white scleras started to occur? What is the origin of the ability to read glance directions, and how does it work?
 
-The stare-in-the-crowd phenomenon shows that human glance perception is accurate even over a distance of several meters. An eye region of 40mm horizontally in 3 meter distance has a perceived visual angle of around 45 arc min. If we further take the mobility of the eye ball to span 4500 arc min (75 degree) and foveal resolution of 1 arc min on the receiving end, the *theoretical* resolution limit for glance direction is approximately 100 arc min (1.7 degree). Compared to that, the horizontal visual angle of the receivers face is 300 arc min.
+In modern humans, glance reading almost certainly is an innate ability, as it starts to develop in the first year of life. If within-species deception was the driving factor behind dark scleras, this implies that a cognitive receiver mechanism has existed all along, and must have evolved for a different purpose. Hoffmann compares human visual processing to a computer user interface, which deceivingly hides the true nature of reality, but does so in a way useful for reproduction.
 
-Under the same circumstances, the senders corneal reflections span 6 arc min on the receiving end and the same calculation produces a resolution limit of 900 arc min (15 degree). It is immediately clear that corneal reflections are not biomimetic, as this would never allow glance perception at a distance.
+Examples for specialized visual processing modes exist, for example in the many ways how male animals perform courtship displays. The human visual system is also specialized to detect certain features, such as faces and primary sexual features. As evolutionary design is inventive only in the sense of re-using existing structures, visual processing modes that appear very specialized have evolved from existing structures and must therefore be very old. As the faces of vertebrates have the same basic structure, there was plenty of time for specialized face recognition mechanisms to evolve, and not just in humans. As the unpigmented human sclera is much younger and may have even have appeared as a sudden mutation, it must have hit on an existing cognitive structure to be effective. 
 
-## QuadBright: A bioconvergent eye tracking method
 
-The QuadBright method is derived from the observation, that eye movements produce a change in spatial *brightness distribution* by the moving iris. Another idea during the design was that in frontal projection, the human eye is almost symmetric in the horizontal and vertical axis. The human visual system is strongly tuned to detect *symmetry*, as is documented by the Gestalt law. From an algorithmic point, symmetry operations are memory efficient and fast to compute. Lastly, computational efficiency can only be claimed if the algorithm uses simple operations and few parameters. Finally, glance perception usually happens from a more or less *frontal perspective*.
+### Cognitive mechanisms glance perception
 
-First, QuadBright fulfills these requirements by drastically degrading the input signal. Every frame is split in four quadrants NE, SE, SW and NW and is reduced to average brightness. During calibration, average quadrant brightness measures are produced with the true location $y_i$ available. This data is send to a regression engine using a multiple linear regression model. This is done separately for x and y directions, not using any conditional terms. The model is trained on the calibration data and then used to predict eye ball position in real time.
+
+Yorzinski et al. (2021, 10.3389/fpsyg.2021.632616) evaluated the glance reading performance in various conditions, including pigmentation of sclera and iris color. The found a strong increase in latency in the combination of pigmented sclera with a dark iris. More interestingly for the quest of the receiving mechanism is that the accuracy was only affected very slightly. Overall, this experiment shows that glance reading is robust under a variety of conditions.
+
+[TODO]: Describe psychophysical properties
+
+...
+
+Some quite generic visual processing modes are commonly known as gestalts, and these have evolved because they match some common patterns in the physical and the biome. For example, the Symmetry gestalt has evolved, because (mirror) symmetry is the most striking feature of practically all extant animals, and therefore is a highly relevant cue. Forming an approximate sphere, the eyeball is strongly symmetric, which is a functional requirement of optical systems, as well as of keeping pressurized  fluid in a container. It may be a co-incidence, but its original shape and the makes the eyeball amenable for quick and accurate visual processing as provided by Symmetry.
+
+
+
+
+
+<!-- The stare-in-the-crowd phenomenon shows that human glance perception is accurate even over a distance of several meters. An eye region of 40mm horizontally in 3 meter distance has a perceived visual angle of around 45 arc min. If we further take the mobility of the eye ball to span 4500 arc min (75 degree) and foveal resolution of 1 arc min on the receiving end, the *theoretical* resolution limit for glance direction is approximately 100 arc min (1.7 degree). Compared to that, the horizontal visual angle of the receivers face is 300 arc min. -->
+
+<!-- Under the same circumstances, the senders corneal reflections span 6 arc min on the receiving end and the same calculation produces a resolution limit of 900 arc min (15 degree). It is immediately clear that corneal reflections are not biomimetic, as this would never allow glance perception at a distance. -->
+
+<!-- ### Bio-convergent Eye Tracking -->
+
+
+
+## Bioconvergent eye tracking
+
+If the eye ball sends such strong signals that humans can still read glance directions in highly degraded images, then it must be possible to build an effective eye tracking device that uses the same information. While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints results in a good model, how human glance reading works.
+
+From the characteristics of human glance reading, the following *bioconvergence requirements* can be derived:
+
+1. The algorithm must be able to work with a very low resolution image, as the human eye is able to read glance directions even in highly degraded images and from a distance.
+1. The algorithm must require only minimal calibration.
+1. The algorithm must be able to work in a wide range of lighting conditions.
+1. The algorithm must use only generic features of the image
+1. The algorithm must be computationally efficient
+
+The initial idea for such an algorithm was derived from the observation of symmetry of the eye ball. While similar approaches attempt to identify the position of the pupil by using computer vision algorithms, this did not seem to satisfy the requirements above.
+
+The QuadBright method is derived from the observation, that the moving pupil produces a change in *spatial brightness distribution*. From an algorithmic point, symmetry operations are memory efficient and fast to compute. The image is split in four equally spaced quadrants  NE, SE, SW and NW (Fig X). By reducing every quadrant to its average brightness, the image resolution is reduced to 2-by-2 pixels. During calibration, average quadrant brightness measures are collected at nine calibration points, and a multiple linear regresion model is trained, for x and y directions separately. The trained model is then used to predict eye ball position from brightness quadrant data in real time.
 
 $$
 y_i = \beta_0 + \beta_1 x_\textrm{NE} + \beta_2 x_\textrm{SE} + \beta_3 x_\textrm{SW} + \beta_4 x_\textrm{NW}

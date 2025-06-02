@@ -305,7 +305,7 @@ M_2 <- stan_glmer(deviation ~ Condition * Exposure + (Condition | Part), family 
 M_4 <- stan_glmer(deviation ~ Condition * Exposure + 
                     (Condition * Exposure | Part)  +
                     (Condition * Exposure | Stim), 
-                  family = neg_binomial_2(), data = JGJH,
+                  family = poisson(), data = JGJH,
                   chains = 8)
 
 save(JGJH, M_1, M_2, M_4, file = "Models.Rda")

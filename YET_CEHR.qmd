@@ -84,14 +84,21 @@ h
 + \beta_{h,\textrm{NE}} \textrm{Br}_\textrm{NE} 
 + \beta_{h,\textrm{NW}} \textrm{Br}_\textrm{NW} 
 + \beta_{h,\textrm{SE}} \textrm{Br}_\textrm{SE}
-+ \beta_{h,\textrm{SW}} \textrm{Br}_\textrm{SW}\\
++ \beta_{h,\textrm{SW}} \textrm{Br}_\textrm{SW}
+
+$$ 
+
+$$
 v 
 = \beta_{v,0} 
 + \beta_{v,\textrm{NE}} \textrm{Br}_\textrm{NE} 
 + \beta_{v,\textrm{NW}} \textrm{Br}_\textrm{NW} 
 + \beta_{v,\textrm{SE}} \textrm{Br}_\textrm{SE}
 + \beta_{v,\textrm{SW}} \textrm{Br}_\textrm{SW}
-$$ While this In this implementation, the model is trained on Quadbright data on nine calibration points shown initially to the participants. Before every single trial a quick calibration is performed to compensate for minor drifts by adjusting the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
+$$
+
+
+While this In this implementation, the model is trained on Quadbright data on nine calibration points shown initially to the participants. Before every single trial a quick calibration is performed to compensate for minor drifts by adjusting the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
 
 ### YET Zero prototype
 
@@ -234,7 +241,7 @@ It can be concluded that the QuadBright algorithm is able to estimate eye ball p
 
 We ran a polynomial multi-level model with intercept, a linear term and a square term to map how the mean error is distribution across target positions. In the center of the screen the error is xy, and the point of maximum accuracy is slightly left (-37.9)and down (-15.2). However, the linear terms are both positive, which means the point of minimum error is xy to the right and xy up from screen center, with quite some uncertainty. Both square terms are positive, which means the error increases towards extreme positions.
 
-```{r eval = F}
+```{r M_0, eval = F}
 options(mc.cores = 8)
 library(rstanarm)
 FB24_1
@@ -249,6 +256,10 @@ save(FB24_1, M_0, file = "M_0.Rda")
 ```
 
 ```{r}
+load("M_0.Rda")
+library(tidyverse)
+library(bayr)
+
 fixef(M_0)
 
 ```
@@ -293,7 +304,7 @@ save(JGJH, file = "JGJH.Rda")
 
 ```
 
-```{r eval = F}
+```{r M_4, eval = F}
 load("JGJH.Rda")
 options(mc.cores = 8)
 library(brms)
@@ -320,31 +331,95 @@ P_4 <-  posterior(M_4)
 
 PP_4 <- post_pred(M_4)
 
+## Part level
 T_4 <- 
   predict(PP_4) |> 
   left_join(JGJH, by = c("Obs"))
 
 ```
 
-The model uses treatment effects coding with Intercept being the baseline (original image, 1000ms). Table X shows population-level coefficients transformed to degrees of deviation, with multiplicative treatment effects. With original images and 1000ms exposure, average deviation is around 13 degree, albeit with some uncertainty. There is quite some variation in participants, and even more so in stimuli.
+The Intercept is the baseline condition (Control, 70 milliseconds) and the remaining coefficients are multiplicative. The average error at baseline is around .5, but we cannot exclude that the true value is .1 lower or higher. 
+With 140 milliseconds performance seems to remain stable on average (0.99), at least we can almost exclude more than slight change of performance. 
+With 400 milliseconds, the error rate drops by 10% and remains on this level, although with considerable uncertainty.
 
-For 600 - 400ms exposures performance , all coefficients are very close to 1, which means that performance remains stable. However, levels of certainty are moderate, such that a slight decrease in performance cannot be ruled out. With 140ms, performance drops slightly in both conditions, with around 20% stronger deviations. With 70ms, performance remains stable in the original condition, but deviations increase by almost 30% with degraded images.
+In the Quadbright condition With 70 milliseconds, the error increases strongly, with the most likely value being 2.2. While there is considerable uncertainty,  we can be almost sure that the penalty is at least a 70% increase. At 140ms, error rates drop by around 25% and remain on this level.
 
-In the Quadbright condition, the average error increases by 70%. The participant-level random effect has a strong variance on the participant level.
 
 ```{r}
-fixef_ml(P_4)
-
 fixef(P_4, mean.func = exp)
 ```
 
-```{r}
-## Population level predictions
+The relatively high levels of uncertainty in the population level effects suggest that on lower levels performance is not uniform, but more complex. 
+Table below shows coefficients on the log scale, together with random effect standard deviations.
+Participants as well as stimuli vary strongly in the first block, and both have additional variation by the Quadbright treatment. 
 
+```{r}
+fixef_ml(P_4)
+```
+
+This implies that an individuals performance in the control condition may not be a good predictor for performance in the Quadbright condition. In fact, the correlation between Intercept and Quadbright random effects is certainly negative for stimuli, and by tendency also for participants. Good performance in the control condition turns into a malus in Quadbright-reduced glance reading.
+
+
+
+
+```{r}
+B_4 <- brms::posterior_samples(M_4)
+
+names(B_4)
+
+B_4 |> 
+  select(cor_Part__Intercept__ConditionQuadbright, cor_Stim__Intercept__ConditionQuadbright) |> 
+  pivot_longer(cor_Part__Intercept__ConditionQuadbright:cor_Stim__Intercept__ConditionQuadbright,
+               names_to = "par") |> 
+  group_by(par) |> 
+  summarize(lower = quantile(value, .025),
+            center = quantile(value,  .5),
+            upper = quantile(value, .975))
+  
+```
+Figure xy shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect that can be obvserved is an enourmous variance in the Quadbright condition. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms, a third group appears with almost stable performance around 10 degree.
+
+
+```{r fig.height = 6, fig.width = 8}
+T_4 |> 
+  group_by(Block, Part) |>
+  summarize(mean_angular_error = mean(center * 30)) |>
+  ungroup() |> 
+  ## because some are zero
+  mutate(mean_angular_error = if_else(mean_angular_error == 0, 0.05, mean_angular_error)) |> 
+  ggplot(aes(x = Block, y = mean_angular_error, group = Part, col = Part)) +
+  geom_line(alpha = .5) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  guides(col="none") #+
+  #scale_y_log10()
+
+
+    
+```
+
+
+
+```{r fig.height = 6, fig.width = 8}
+library(ggrepel)
+
+T_4 |> 
+  group_by(Block, Stim) |>
+  summarize(mean_angular_error = mean(center * 30)) |>
+  ungroup() |> 
+  ## because some are zero
+  mutate(mean_angular_error = if_else(mean_angular_error == 0, 0.05, mean_angular_error)) |> 
+  ggplot(aes(x = Block, 
+             y = mean_angular_error, 
+             group = Stim, col = Stim, label = Stim)) +
+  geom_line(alpha = .5) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  geom_label_repel(aes(), size = 2)
 
 ```
 
-```{r fig.height = 6, fig.width = 6}
+
+
+```{r}
 range_control <-
   T_4 |> 
   filter(Condition == "Control" & Exposure == 1000) |> 
@@ -371,43 +446,18 @@ range_quadbright <-
     round(2)
 
 
-T_4 |> 
-  group_by(Block, Part) |>
-  summarize(mean_angular_error = mean(center * 30)) |>
-  ungroup() |> 
-  ggplot(aes(x = Block, y = mean_angular_error, group = Part, col = Part)) +
-  geom_line(alpha = .5) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  guides(col="none")
 
-
-    
-```
-
-```{r}
-B_4 <- brms::posterior_samples(M_4)
-
-names(B_4)
-
-B_4 |> 
-  select(value = cor_Part__Intercept__ConditionQuadbright) |> 
-  summarize(lower = quantile(value, .025),
-            center = quantile(value,  .5),
-            upper = quantile(value, .975))
-  
 ```
 
 
-Our claim is that the receiver mechanism emerged from reciprocal evolution, which implies that it is universal in the population. Figure shows the averaged participant-level predictions across experimental conditions ranges. In the control condition, the baseline performance ranges from `r range_baseline[1]` from majority of participants shows stable performance across conditions, which is evident visually by the relatively few line-crossings.
 
-The Quadbright condition is like rolling another dice. Again, the lines flow largely parallel, but the field is extremely distributed, to the extent of one participant reaching exactly zero deviations at 1000ms exposure, while another participant shows an average error of `r range_quadbright[2]` degree, which is close to guessing. Both extreme participant were in the middle field in the control condition and generally there is no prominent relationship between performance in the control and Quadbright condition, which suggests that the Quadbright degradation is not a simple transformation of the original image, but rather a different cognitive task. This is supported by a slightly negative correlation of $-0.24$ between performance the two conditions.
+
+Our claim is that the receiver mechanism emerged from reciprocal evolution, which implies that it is universal in the population. Figure shows the averaged participant-level predictions across experimental conditions ranges.  
+
+The Quadbright condition is like rolling another dice. Again, the lines flow largely parallel, but the field is extremely distributed, to the extent of one participant reaching exactly zero deviations at 1000ms exposure, while another participant shows an average error of `r range_quadbright[2]` degree, which is close to guessing. Both extreme participant are in the middle field in the control condition and generally there is no prominent relationship between performance in the control. There even is moderate support for a negative correlation between Quadbright and Control.
 
 Across exposure times a consistent pattern emerges, but more complex than expected. The conditional effect for 70ms exposure can be observed as a consistent sharp increase, so can be called universal. In almost all cases, the error increases strongly with 70ms exposure, which means the effect we observed is universal. However, there also appears a consistent peak at 600ms exposure. The related population-level effect was very small and highly uncertain, but the consistency of this pattern raises some questions.
 
-```{r}
-rstanarm::VarCorr(M_4)
-
-```
 
 ## Discussion
 
@@ -424,19 +474,47 @@ The eye tracker is relatively sensitive to changing lighting conditions, which w
 
 Human glance reading also takes the senders head position into account. This has been shown to be the major mechanism for shared attention detection in chimpanzees, so it either a very old cognitive function, or it is convergent. Head position is commonly based on algorithms that first detect a configuration of prominent facial features and then estimate the head position from the relative positions of these features. To emulate the human visual system, another camera could be used, facing the participant from a fixed position. The Quadbright algorithm could be extended to include a head position estimate in much the same way, but technically is probably easier, and more efficient, to use the signal of a gyroscope sensor attached to the head mount.
 
-By its existence, the Quadbright method proves that the human eye ball has evolved to send a robust and computationally efficient glance direction signals. Overall, glance reading accuracy in this experiment was surprisingly low with original images (around 14 degree on average), where others have reported much higher accuracy \[XY\]. A possible cause is that the experiment used quite extreme target positions. It is known that glance reading performance deteriorates to the periphery \[XY\], and also the eye tracker shows lower accuracy in extreme positions.
+By its existence, the Quadbright method proves that the human eye ball is indeed sending robust and computationally efficient glance direction signals. This does not mean, it has evolved to be a signalling device, if we follow KKs argument, that producing pigments is an active function to hide the sclera. Also from a biophysical point of view, the geometric simplicity and the high contrasts are functional requirements for lenses and pressure containers. The eyeball is as it is.
+
+For the theory of the Cooperative Eye, this is in line with the sclera camouflage argument of KK. Given that sclera camouflage is basically the default in a wide variety of simians,  this implies that their is no lack in receiving mechanisms. If you are born with a white sclera, the puma on the next tree will catch you soon.
+
+If it is true that many animals can detect other animals by their eyes, this must either be an evolutionary old function, or by convergent evolution. Reading brightness gradients is an almost universal function in habitats where light exists, and has evolved at least as often as eyes have evolved in the animal kingdom. It is relatively likely that a cognitive mechanism to read glances originates in gradient perception.
+ 
+
 
 ### Evolution of the receving end
 
-But, is the Quadbright algorithm bio-convergent on the deeper level of cognitive processing? Is the visual system solving a series of simple linear equations? If the algorithm is a good model of human glance perception, then all humans should be able to read glance directions from the same information available to the eye tracker.
+Maybe there lives, or once lived, a puma which could predict the direction of flight from the brightness distribution monkey eyes. But, is the Quadbright algorithm bio-convergent with human glance reading? Is the visual system solving a series of simple linear equations? 
+If the algorithm is a good model of human glance perception, then all humans should be able to read glance directions from the same information available to the eye tracker, which is not the case. 
 
-The universal drop in performance at very short exposure times suggests that Quadbright processing is not quite the same. A smaller decline was observed with undegraded images, which could mean that brightness information is part of the glance reading process, but is complemented by other processes which are even quicker. A more conservative explanation is that with these short exposure times, the iconic memory plays a significant role by extending the decoding time. The decay rate of iconic memory depends on several factors, but it is known to be slower for high contrast images \[REF\], which is is the undegraded image in this case. A future experiment should use visual masking to over-write iconic memory. If iconic memory is the root cause of this effect, performance should drop equally in both conditions.
+The dominant drop in performance suggests that Quadbright processing is not the full story of reading eyeballs. 
+But, it may be part of it, which would explain why some participants performed very well in the Quadbright condition.
+Stimuli that were more readable in the control condition were less readable in the Quadbright condition, and by tendency participants more capable in one condition were less accurate in teh other.
+Taken together, this suggests that at least two processes must be at work, Quadbright and P. 
 
-In the Quadbright condition we primarily observed stable performance differences by a factor of almost two magnitudes. *Some* humans read glance directions from the Quadbright images perfectly well, and sometimes even better, whereas for some others it becomes guess work, more or less. This can only mean that different cognitive strategies exist. That Quadbright processing is one of them is supported by the fact that several participants profited from Quadbright, reaching exceptional performance. This could be explained as some sort of pre-processing for their system. A more complex explanation is that two processes exist, P and Quadbright, but only P is present as a trait in all humans. When both traits are present in a person, they are in a race, and under good visual conditions, P wins most of the time, although Quadbright is more accurate overall. Under poor viewing conditions Quadbright takes over, if it is present.
+In the indivisual trajectories, we observed three groups:
 
-A possible contender for the P process is blob detection, which was discussed above, and given how robust performance is with short exposure, P could be part of the face detection mechanism, which is known to be extremely fast. This would be in contradiction with our general assumption that evolution favors simplicity. However, it is inline with the evolutionary principle of bricolage, in that new functions practically almost arise by modification of existing functions. From this perspective, we suppose that P could have emerged as a modification or part of visual face detection. A possible approach to test this hypothesis is to repeat the experiment with upside-down faces, which is known to effectively suppress face detection. This would also suppress P, with negative consequences for people without Quadbright.
+1. Quadbright is impossible
+2. Quadbright works, but costs accuracy
+3. Quadbright works evenly well on a high level of accuracy.
 
-As we have argued, when the white sclera first appeared, it must have hit one something on the receiving end. Possibly, this was the mechanism of face detection, which had much more time to evolve. The early benefits of P may also have involved socialization to some extent, for example, children could have learned P through correlation with other cues, such as facial expression, finger-pointing, or object detection. Recent findings show that human evolution is in full progress \[third upper-arm artery, selection in high altitude\], and it may be that the ability to read glances by Quadbright is in the process to evolve, in the sense that is has not yet reached everybody.
+
+<!--A smaller decline was observed with undegraded images, which could mean that brightness information is part of the glance reading process, but is complemented by other processes which are even quicker. A more conservative explanation is that with these short exposure times, the iconic memory plays a significant role by extending the decoding time. The decay rate of iconic memory depends on several factors, but it is known to be slower for high contrast images \[REF\], which is is the undegraded image in this case. A future experiment should use visual masking to over-write iconic memory. If iconic memory is the root cause of this effect, performance should drop equally in both conditions.-->
+
+<!--In the Quadbright condition we primarily observed stable performance differences by a factor of almost two magnitudes. *Some* humans read glance directions from the Quadbright images perfectly well, and sometimes even better, whereas for some others it becomes guess work, more or less. This can only mean that different cognitive strategies exist. That Quadbright processing is one of them is supported by the fact that several participants profited from Quadbright, reaching exceptional performance. This could be explained as some sort of pre-processing for their system. A more complex explanation is that two processes exist, P and Quadbright, but only P is present as a trait in all humans. When both traits are present in a person, they are in a race, and under good visual conditions, P wins most of the time, although Quadbright is more accurate overall. Under poor viewing conditions Quadbright takes over, if it is present.-->
+
+As the super performers appeared only after block 2, it is possible that these participants simply learned the twelve faces in two blocks of 70ms. This is mainly a weakness in the experimental design. But, this wouldn't explain why it appears only in three individuals and why  so abruptly after two blocks.
+
+A possible contender for the P process is blob detection, which was discussed above, and given how robust performance is with short exposure, P could be part of the face detection mechanism, which is known to be extremely fast. This would be in contradiction with our general assumption that evolution favors simplicity. 
+However, it is inline with the evolutionary principle of bricolage, in that new functions practically almost arise by modification of existing functions.
+From this perspective, we suppose that P could have emerged as a modification or part of visual face detection. 
+A possible approach to test this hypothesis is to repeat the experiment with upside-down faces, which is known to effectively suppress face detection. 
+This would also suppress P, with negative consequences for people without Quadbright.
+
+As we have argued, when the white sclera first appeared, it must have hit one something on the receiving end. 
+Possibly, this was the mechanism of face detection, which had much more time to evolve. 
+The early benefits of P may also have involved socialization to some extent, for example, children could have learned P through correlation with other cues, such as facial expression, finger-pointing, or object detection. 
+Recent findings show that human evolution is in full progress \[third upper-arm artery, selection in high altitude\], and it may be that the ability to read glances by Quadbright is in the process to evolve, in the sense that is has not yet reached everybody.
 
 ### Future research
 

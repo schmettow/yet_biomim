@@ -3,47 +3,61 @@ title: "The Receiving End of the Cooperative Eye Hypothesis"
 author: "M Schmettow, C. Willemse, S. Borsci"
 format: docx
 editor: visual
+bibliography: yet_biomim.bib
+csl: nature.csl
 ---
 
 ## Introduction
 
-The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour. Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera. The first argument in this paper is that under the CEH it is very likely that the eye ball evolves into a form that is *computationally efficient*. The ability to establish shared attention by glance perception may have also played a role in child rearing, which suggests that a *specialized receiver mechanism* to read glance direction may have evolved alongside.
+The human eye region has a central role in non-verbal communication. Next to emotional expressions, humans are very accurate and fast at reading each others glance directions. The Cooperative Eye Hypothesis (CEH) states that this ability has evolved, when human ancestors developed their ability to cooperate and show genuine altruistic behaviour . Initially, the hypothesis is based on the observation that Homo Sapiens (HS) is the only species among extant Great Apes, which has developed a visible white sclera.
 
-Eye tracking devices are a instruments to observe glance directions. From the CEH it follows that the eye ball is sending strong signals, such that a device to read glance directions should be easy to construct, if just the cognitive mechanism was known. Under the CEH, effective eye tracking must be possible using only visual information that also is available to a human receiver. In contrast, recent eye tracking technology often relies on corneal reflections, which is not what humans usually see and thus not cannot be biomimetic.
+The first argument developed in this paper is that under the CEH it is very likely that the eye ball has evolved into a form that is *computationally simple* with regard to inferring the glance direction. If the human eye ball is sending strong and easy-to-decipher direction signals, it should be relatively simple to create a computationally efficient devices for reading the position of human eyeballs. In fact, *eye tracking* systems are commonly used computational devices to record human glance directions. The conundrum is that most of these devices are definitly not *bio-mimetic* as they use visual information that is not available to the human observer.
 
-Truly bio-mimetic eye tracking devices would require a precise cognitive model of glance perception, which is not available, yet. However, it is possible to build an eye tracker, that can be called *bioconvergent*, in that it may work differently in detail, but limited to the information available also to human receivers. Moreover, given the exceptional performance of human glance perception, a bio-convergent device, must be accurate and computational efficient. In this paper we present a bio-convergent method for eye-tracking. The *QuadBright* method uses visible light brightness distributions of the image and basic statistical learning to establish eye tracking. The first study presented in this paper evaluates the accuracy of the QuadBright method.
+In the first part of this paper, we turn the problem upside down, by developing a technical method for eye tracking, that possibly is bio-mimetic, in that it only uses visual information also available to the human observer. The *QuadBright* method is introduced, which uses visible light brightness distributions of the image and basic statistical learning to establish eye tracking. The first study presented in this paper evaluates the accuracy of the QuadBright method, showing whether or not such a simple algorithm suffices to read glance directions.
 
-Once a bio-convergent eye tracking device is established, it is the first candidate for a cognitive model of human glance perception. This can be tested experimentally, by comparing human glance perception performance with the information available to the QuadBright algorithm, to human glance perception accuracy with the original image. Human glance perception is known to be extremely quick and effortless under normal conditions, a follow-up test for a candidate model is how it performs under brief exposure times.
+The second argument developed in this work is that the evolution of a strong sender mechanism is only one side of the coin. The ability of glance reading has been said to have a cucial role in human infant development, which suggests that a *specialized cognitive receiver mechanism* has evolved alongside.
 
-The second study presented in this paper evaluates human glance perception performance in a two-factorial experiment, comparing the accuracy of the Quadbright degradation to the original image under varying exposure times.
+The ability to establish shared attention by glance perception may have also played a role in child rearing, which suggests that a *specialized receiver mechanism* to read glance direction may have evolved alongside. The Quadbright algorithm can serve as a the first candidate for a cognitive model of human glance perception. Its suitability as a cognitive model can be tested experimentally by assessing human glance perception with the visual information limited to what the QuadBright algorithm uses.
 
 The aim of this paper is to first test the CEH by construction. If the Quadbright algorithm is indeed effective for (machine-based) eye tracking, the claim that the eyeball has evolved to be a computationally efficient sender of glance direction signals is supported. The second aim is to extend the CEH by postulating that a reciprocal cognitive mechanism has evolved on the receiving end, and proposing a candidate model for it.
 
 ### The Cooperative Eye Hypothesis (CEH)
 
-All animal scleras are white, but in almost all species most oof it is occluded by a layer of pigmentation in the conjunctiva. As KK note, sustaining pigmentation costs the organism energy. From a biophysical perspective it takes a very precise molecular configuration to produce exact colors. The biosynthetic pathways of melanin are complex and several mutations are known, such as albinism, and bright iris color (Eiberg et al., 2008). Non fatal single-point mutations are possible and could have benefits for the organism, the real question therefore seems to be: why have Great Apes and many other animals dark scleras?
+The Cooperative Eye Hypothesis originates in the observation that almost all Greater Ape species have dark scleras, with Homo Sapiens being the one exception (@Kobayashi2001). As a matter of fact, all Great Ape scleras are originally white, but in almost all extant species most of it is occluded by a layer of pigmentation in the conjunctiva (@Mearing2022).
 
-One explanation is that protection against predators. Since the eyeball is an optical device in the first place, a pupil is dark almost inevitable. In its default state, the animal eye is a high-contrast target, that is also rapidly moving in the case of Great Apes, and the conjunctiva pigmentation may have evolved as camouflage (KK). Another hypothesis is that within-species competition is the driving force for dark scleras in the Great Apes.
+As @Kobayashi2001 note, sustaining pigmentation costs the organism energy. From a biophysical perspective it takes a very precise molecular configuration to produce exact colors. The biosynthetic pathways of melanin are complex and several mutations are known, such as albinism, and bright iris color (Eiberg et al., 2008). Non fatal single-point mutations are possible and could have benefits for the organism. This raises two questions: Why have Great Apes and many other animals evolved dark scleras? And: What made the pigmentation disappear in Homo sapiens?
 
-### Origins of Glance Reading
+One explanation is protection against predators. Since the sclera is originally white and pupils are dark, the animal eye is a high-contrast target, that is also rapidly moving in the case of Great Apes. The most common explanation for the evolution of conjunctiva pigmentation is that it establishes camouflage, which is equally selective for predator and prey species.
 
-Originally, the Cooperative Eye Hypothesis (CEH) by KK is based on one distinguishing, and literally eye-catching, feature of Homo Sapiens anatomy. However, there is no signal without a receiver. For the CEH to be complete, it must explain how the receiving mechanism has evolved, unless the human eyeball has evolved to such a perfection that it entirely works on existing cognitive mechanisms.
+The Cooperative Eye Hypothesis explains the de-pigmentation of human scleras in conjunction with the hyper-sociality of humans. According to @Kobayashi2001, the human eye may have evolved into a non-verbal communication device, facilitating coordinated group activities, such as hunting. Another aspect of human life that may have benefited from improved gaze signalling is child-rearing. Studies by Farroni et al. have shown that already newborns react to direct gaze and show rudimentary forms of gaze following
 
-Tracking down the evolutionary origins of cognitive processes, in this case, reading glances, is much more intricate. The best we know comes from a comparative studies with chimpanzees \[REF\], where the participants showed no sign of glance reading, but rather relied on head position. If only we assume that chimpanzees have not lost the ability to read glances since the last common ancestor with HS, the ability to read glances must have evolved in the last two million years.
+### Evolutionary Origins of Gaze Reading
 
-If pigmented eyes have developed for camouflage, the possibility of a single-point mutation or a genetic drift producing a white sclera certainly exists. However, even if the human eyeball sprang into existence by a single-point mutation, evolutionary theory requires that it must have had at least some immediate reproductive advantage. For example, it could suffice that reading white-sclera glances is an ability that can be learned, rather than being innate. A possible way to test this hypothesis is to train chimpanzees to read glance directions.
+Originally, the Cooperative Eye Hypothesis (CEH) by KK is based on one distinguishing, and literally eye-catching, feature of Homo Sapiens anatomy. However, there is no signal without a receiver. For the CEH to be complete, it must explain the receiving mechanism. For the evolution of this mechanism, the two extreme possibilities are that it already existed prior to the de-pigmentation of human eyes, or has evolved as a consequence.
 
-The remaining question therefore is whether the white sclera of modern humans appeared as a single-point mutation, or by slow genetic drift. Assuming that the receiver mechanism at that time was effective only to a fraction of the current human glance reading performance, the white sclera must have been an effective signal from the start, making a single-point mutation more likely. Perhaps, this was followed by a slow genetic drift on the side of the sender.
+Baron Cohen speculated about the existence of a specialized cognitive component, the eye direction detector (EDD), which is already functional in early childhood, and may even be shared with other species. If this were true, then the evolution of the white sclera most likely followed the evolution of EDD, and took the current form to suit the existing mechanism. The problem with this idea is to explain the evolutionary process leading to the EDD. Such a highly specialized cognitive mechanism can only evolve if there is an immediate reproductive benefit, which is hardly the case with the prevalent pigmented scleras in almost all species.
+
+Tracking down the evolutionary origins of cognitive processes, in this case, reading glances, is much more intricate. The best we know comes from a comparative studies with chimpanzees \[REF\], where the participants showed no sign of glance reading, but rather relied on head position. If only we assume that chimpanzees have not lost the ability to read glances since the last common ancestor with HS, the ability to read glances must be unique to Homo Sapiens and has happened in the last two million years.
+
+The same evolutionary argument holds if we assume that white scleras took precedence. They must have had an immediate reproductive advantage. However, since pigmentation is an active process, the possibility of a single-point mutation or a genetic drift producing a white sclera is much easier to imagine, then the evolution of a specialized cognitive mechanism.
+
+A possible middle ground is to assume that the white sclera appeared before the EDD, but had been hitting on something existing, perhaps a precursor to the EDD, or something entirely different. While this would have provided the necessary reproductive benefits, the EDD in its present functional form could have evolved as a consequence of the existence of the signal.
+
+<!--The remaining question therefore is whether the white sclera of modern humans appeared as a single-point mutation, or by slow genetic drift. Assuming that the receiver mechanism at that time was effective only to a fraction of the current human glance reading performance, the white sclera must have been an effective signal from the start, making a single-point mutation more likely. Perhaps, this was followed by a slow genetic drift on the side of the sender.-->
 
 <!--Many examples exist for Examples for specialized visual processing modes exist, for example in the many ways how male animals perform courtship displays. The human visual system is also specialized to detect certain features, such as faces and primary sexual features. As evolutionary design is inventive only in the sense of re-using existing structures, visual processing modes that appear very specialized have evolved from existing structures and must therefore be very old. As the faces of vertebrates have the same basic structure, there was plenty of time for specialized face recognition mechanisms to evolve, and not just in humans. As the unpigmented human sclera is much younger and may have even have appeared as a sudden mutation, it must have hit on an existing cognitive structure to be effective. -->
 
 ### Cognitive mechanisms of glance reading
 
 Face detection is probably the first specialized recognition for complex visual pattern to emerge in human ontogenesis. It is known to be extremely fast \[REF\] and robust, even greedy, as is evident by the phenomenon of anthropomorphism \[REF\]. Face detection is doubtlessly a cognitive function shaped by evolution, but there are differences to glance direction reading.
+First of all, almost all vertebrates have faces and several mammals from different branches use facial expressions in social interaction \[REF\] (felidae, canae, apes). Even if this would be a result of convergent evolution, we can assume that face detection has evolved much longer ago than glance direction reading. 
 
-First of all, almost all vertibrates have faces and several mammals from different branches use facial expressions in social interaction \[REF\] (felidae, canae, apes). Even if this would be a result of convergent evolution, we assume that face detection has evolved much longer ago than glance direction reading.
+From a perceptual perspective, a face is a characteristic configuration of low-detail "visual blobs". As the human visual system detects low-frequency features much faster, than fine details, it is easy to see how face detection could become such a feat. However, in the usual range of social distance of 1-2m, the eye region consumes a much smaller visual angle, and the transmitted information is much more delicate, as small movements of the eye ball can change the glance direction by several degrees.
 
-From a perceptual perspective, a face is a configuration of low-detail "visual blobs". As the human visual system detects low-frequency features much faster, than fine details, it is easy to see how face detection could become such a feat. However, in the usual range of social distance of 1-2m, the eye region consumes a much smaller visual angle, and the transmitted information is much more delicate, as small movements of the eye ball can change the glance direction by several degrees.
+Still, the eye region itself is an important social cue for several mammal species. 
+In dogs, wolves and cats, intensive direct eye-to-eye contact (EEC) is interpreted as a challenge or aggression, whereas in other cases it is a social bonding cue (@Zanoli2021). Also for humans, direct eye contact is a strong cue that activates social pathways in the brain (@Senju2009). An eye-contact detector (ECD) is therefore a possible precursor of the postulated eye-direction detector (EDD).
+
+#### HERE
 
 Yorzinski et al. (2021, 10.3389/fpsyg.2021.632616) evaluated the glance reading performance in various conditions, including pigmentation of sclera and iris color. The found a strong increase in latency in the combination of pigmented sclera with a dark iris. More interestingly for the quest of the receiving mechanism is that the accuracy was only affected very slightly. Overall, this experiment shows that glance reading is robust under a variety of conditions.
 
@@ -78,15 +92,9 @@ The initial idea for an algorithm that is robust under visible light, computatio
 
 The QuadBright method uses the simple fact that the moving pupil produces a change in *spatial brightness distribution*, horizontally and vertically. The image captured by the camera is reduced to a 2x2 matrix in 8 bit greyscale, by splitting it horizontally and vertically in four quadrants (NE, SE, SW and NW, see Fig X) and taking the average brightness (Br). This is used as input for a multiple linear regression model, which predicts the horizontal and vertical position of the eye ball. The following equation shows the model for the horizontal position
 
-$$
-h 
-= \beta_{h,0} 
-+ \beta_{h,\textrm{NE}} \textrm{Br}_\textrm{NE} 
-+ \beta_{h,\textrm{NW}} \textrm{Br}_\textrm{NW} 
-+ \beta_{h,\textrm{SE}} \textrm{Br}_\textrm{SE}
-+ \beta_{h,\textrm{SW}} \textrm{Br}_\textrm{SW}
+\$\$ h = \beta\*{h,0} +\* \beta{h,\textrm{NE}} \textrm{Br}\textrm{NE} + \beta{h,\textrm{NW}} \textrm{Br}\textrm{NW} + \beta{h,\textrm{SE}} \textrm{Br}\textrm{SE} + \beta{h,\textrm{SW}} \textrm{Br}\_\textrm{SW}
 
-$$ 
+\$\$
 
 $$
 v 
@@ -96,7 +104,6 @@ v
 + \beta_{v,\textrm{SE}} \textrm{Br}_\textrm{SE}
 + \beta_{v,\textrm{SW}} \textrm{Br}_\textrm{SW}
 $$
-
 
 While this In this implementation, the model is trained on Quadbright data on nine calibration points shown initially to the participants. Before every single trial a quick calibration is performed to compensate for minor drifts by adjusting the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
 
@@ -264,10 +271,6 @@ fixef(M_0)
 
 ```
 
-
-
-
-
 ## Study 2: Human glance perception with QuadBright information
 
 The first study established that a simple machine learning algorithm can estimate eye positions with a reasonable accuracy from highly degraded images. The Quadbright algorithm is therefore a viable candidate model for human glance perception. The second study was conducted to test this possibility by assessing human glance reading performance on images degraded by the Quadbright method.
@@ -338,29 +341,21 @@ T_4 <-
 
 ```
 
-The Intercept is the baseline condition (Control, 70 milliseconds) and the remaining coefficients are multiplicative. The average error at baseline is around .5, but we cannot exclude that the true value is .1 lower or higher. 
-With 140 milliseconds performance seems to remain stable on average (0.99), at least we can almost exclude more than slight change of performance. 
-With 400 milliseconds, the error rate drops by 10% and remains on this level, although with considerable uncertainty.
+The Intercept is the baseline condition (Control, 70 milliseconds) and the remaining coefficients are multiplicative. The average error at baseline is around .5, but we cannot exclude that the true value is .1 lower or higher. With 140 milliseconds performance seems to remain stable on average (0.99), at least we can almost exclude more than slight change of performance. With 400 milliseconds, the error rate drops by 10% and remains on this level, although with considerable uncertainty.
 
-In the Quadbright condition With 70 milliseconds, the error increases strongly, with the most likely value being 2.2. While there is considerable uncertainty,  we can be almost sure that the penalty is at least a 70% increase. At 140ms, error rates drop by around 25% and remain on this level.
-
+In the Quadbright condition With 70 milliseconds, the error increases strongly, with the most likely value being 2.2. While there is considerable uncertainty, we can be almost sure that the penalty is at least a 70% increase. At 140ms, error rates drop by around 25% and remain on this level.
 
 ```{r}
 fixef(P_4, mean.func = exp)
 ```
 
-The relatively high levels of uncertainty in the population level effects suggest that on lower levels performance is not uniform, but more complex. 
-Table below shows coefficients on the log scale, together with random effect standard deviations.
-Participants as well as stimuli vary strongly in the first block, and both have additional variation by the Quadbright treatment. 
+The relatively high levels of uncertainty in the population level effects suggest that on lower levels performance is not uniform, but more complex. Table below shows coefficients on the log scale, together with random effect standard deviations. Participants as well as stimuli vary strongly in the first block, and both have additional variation by the Quadbright treatment.
 
 ```{r}
 fixef_ml(P_4)
 ```
 
 This implies that an individuals performance in the control condition may not be a good predictor for performance in the Quadbright condition. In fact, the correlation between Intercept and Quadbright random effects is certainly negative for stimuli, and by tendency also for participants. Good performance in the control condition turns into a malus in Quadbright-reduced glance reading.
-
-
-
 
 ```{r}
 B_4 <- brms::posterior_samples(M_4)
@@ -377,8 +372,8 @@ B_4 |>
             upper = quantile(value, .975))
   
 ```
-Figure xy shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect that can be obvserved is an enourmous variance in the Quadbright condition. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms, a third group appears with almost stable performance around 10 degree.
 
+Figure xy shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect that can be obvserved is an enourmous variance in the Quadbright condition. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms, a third group appears with almost stable performance around 10 degree.
 
 ```{r fig.height = 6, fig.width = 8}
 T_4 |> 
@@ -397,8 +392,6 @@ T_4 |>
     
 ```
 
-
-
 ```{r fig.height = 6, fig.width = 8}
 library(ggrepel)
 
@@ -416,8 +409,6 @@ T_4 |>
   geom_label_repel(aes(), size = 2)
 
 ```
-
-
 
 ```{r}
 range_control <-
@@ -449,15 +440,11 @@ range_quadbright <-
 
 ```
 
-
-
-
-Our claim is that the receiver mechanism emerged from reciprocal evolution, which implies that it is universal in the population. Figure shows the averaged participant-level predictions across experimental conditions ranges.  
+Our claim is that the receiver mechanism emerged from reciprocal evolution, which implies that it is universal in the population. Figure shows the averaged participant-level predictions across experimental conditions ranges.
 
 The Quadbright condition is like rolling another dice. Again, the lines flow largely parallel, but the field is extremely distributed, to the extent of one participant reaching exactly zero deviations at 1000ms exposure, while another participant shows an average error of `r range_quadbright[2]` degree, which is close to guessing. Both extreme participant are in the middle field in the control condition and generally there is no prominent relationship between performance in the control. There even is moderate support for a negative correlation between Quadbright and Control.
 
 Across exposure times a consistent pattern emerges, but more complex than expected. The conditional effect for 70ms exposure can be observed as a consistent sharp increase, so can be called universal. In almost all cases, the error increases strongly with 70ms exposure, which means the effect we observed is universal. However, there also appears a consistent peak at 600ms exposure. The related population-level effect was very small and highly uncertain, but the consistency of this pattern raises some questions.
-
 
 ## Discussion
 
@@ -465,8 +452,7 @@ Across exposure times a consistent pattern emerges, but more complex than expect
 
 The Cooperative Eye Theory states that the eyeball has evolved to be a sender of glance direction signals. If that is true, it must be easy to construct a machine algorithm reading glance directions, as the human visual system is able to do so. We showed that a remarkably simple algorithm can estimate eye positions with good accuracy, using four-pixel images and a 10-parameter model. This model can be solved by the method of least-squares, where all computations during training and prediction are analytically closed, requiring no costly numerical approximations, recursions, or iterative procedures. Memory consumption is minimal, too, requiring only 14 Byte for making a prediction.
 
-Additionally, it was required that the algorithm must function under natural conditions, such as reading glances from a distance. We did not test this directly, but the mere fact that glance directions can be estimated from a 2x2 pixel matrix suggests that the algorithm could definitely work. 
-The Quadbright method has even more virtues that enhance its utility and may therefore have (had) additional reproductive advantage. The little information it needs also works in the low-resolution retinal areas outside the fovea region, and even in night vision. If the group-in-action scenario proposed by KK is the origin of glance reading, then it is more useful if the receiver doesn't have to look directly at the sender, but can read glance directions from the periphery. This may also explain the common feeling of "someones eyes on me". For hunters it is also very useful to be able to read glance directions in low light conditions, such as at dusk or dawn.
+Additionally, it was required that the algorithm must function under natural conditions, such as reading glances from a distance. We did not test this directly, but the mere fact that glance directions can be estimated from a 2x2 pixel matrix suggests that the algorithm could definitely work. The Quadbright method has even more virtues that enhance its utility and may therefore have (had) additional reproductive advantage. The little information it needs also works in the low-resolution retinal areas outside the fovea region, and even in night vision. If the group-in-action scenario proposed by KK is the origin of glance reading, then it is more useful if the receiver doesn't have to look directly at the sender, but can read glance directions from the periphery. This may also explain the common feeling of "someones eyes on me". For hunters it is also very useful to be able to read glance directions in low light conditions, such as at dusk or dawn.
 
 Altogether, the eye ball as a sender and the Quadbright algorith on the receiving end seem like a very good fit. However, to truly work under real circumstances, several other components are needed, for the eye tracker, but also in the human mind. In real situations the image is not stable, but constantly changing. Another feat of the human visual system is how it can track objects, i.e. the eye region, with ease. The oculomotor system even has a special mode for this, called smooth pursuit \[XY\]. Object tracking is a feature in many technical systems, such as autofocus for cameras, or assisted driving systems.
 
@@ -476,45 +462,31 @@ Human glance reading also takes the senders head position into account. This has
 
 By its existence, the Quadbright method proves that the human eye ball is indeed sending robust and computationally efficient glance direction signals. This does not mean, it has evolved to be a signalling device, if we follow KKs argument, that producing pigments is an active function to hide the sclera. Also from a biophysical point of view, the geometric simplicity and the high contrasts are functional requirements for lenses and pressure containers. The eyeball is as it is.
 
-For the theory of the Cooperative Eye, this is in line with the sclera camouflage argument of KK. Given that sclera camouflage is basically the default in a wide variety of simians,  this implies that their is no lack in receiving mechanisms. If you are born with a white sclera, the puma on the next tree will catch you soon.
+For the theory of the Cooperative Eye, this is in line with the sclera camouflage argument of KK. Given that sclera camouflage is basically the default in a wide variety of simians, this implies that their is no lack in receiving mechanisms. If you are born with a white sclera, the puma on the next tree will catch you soon.
 
 If it is true that many animals can detect other animals by their eyes, this must either be an evolutionary old function, or by convergent evolution. Reading brightness gradients is an almost universal function in habitats where light exists, and has evolved at least as often as eyes have evolved in the animal kingdom. It is relatively likely that a cognitive mechanism to read glances originates in gradient perception.
- 
-
 
 ### Evolution of the receving end
 
-Maybe there lives, or once lived, a puma which could predict the direction of flight from the brightness distribution monkey eyes. But, is the Quadbright algorithm bio-convergent with human glance reading? Is the visual system solving a series of simple linear equations? 
-If the algorithm is a good model of human glance perception, then all humans should be able to read glance directions from the same information available to the eye tracker, which is not the case. 
+Maybe there lives, or once lived, a puma which could predict the direction of flight from the brightness distribution monkey eyes. But, is the Quadbright algorithm bio-convergent with human glance reading? Is the visual system solving a series of simple linear equations? If the algorithm is a good model of human glance perception, then all humans should be able to read glance directions from the same information available to the eye tracker, which is not the case.
 
-The dominant drop in performance suggests that Quadbright processing is not the full story of reading eyeballs. 
-But, it may be part of it, which would explain why some participants performed very well in the Quadbright condition.
-Stimuli that were more readable in the control condition were less readable in the Quadbright condition, and by tendency participants more capable in one condition were less accurate in teh other.
-Taken together, this suggests that at least two processes must be at work, Quadbright and P. 
+The dominant drop in performance suggests that Quadbright processing is not the full story of reading eyeballs. But, it may be part of it, which would explain why some participants performed very well in the Quadbright condition. Stimuli that were more readable in the control condition were less readable in the Quadbright condition, and by tendency participants more capable in one condition were less accurate in teh other. Taken together, this suggests that at least two processes must be at work, Quadbright and P.
 
 In the indivisual trajectories, we observed three groups:
 
-1. Quadbright is impossible
-2. Quadbright works, but costs accuracy
-3. Quadbright works evenly well on a high level of accuracy.
-
+1.  Quadbright is impossible
+2.  Quadbright works, but costs accuracy
+3.  Quadbright works evenly well on a high level of accuracy.
 
 <!--A smaller decline was observed with undegraded images, which could mean that brightness information is part of the glance reading process, but is complemented by other processes which are even quicker. A more conservative explanation is that with these short exposure times, the iconic memory plays a significant role by extending the decoding time. The decay rate of iconic memory depends on several factors, but it is known to be slower for high contrast images \[REF\], which is is the undegraded image in this case. A future experiment should use visual masking to over-write iconic memory. If iconic memory is the root cause of this effect, performance should drop equally in both conditions.-->
 
 <!--In the Quadbright condition we primarily observed stable performance differences by a factor of almost two magnitudes. *Some* humans read glance directions from the Quadbright images perfectly well, and sometimes even better, whereas for some others it becomes guess work, more or less. This can only mean that different cognitive strategies exist. That Quadbright processing is one of them is supported by the fact that several participants profited from Quadbright, reaching exceptional performance. This could be explained as some sort of pre-processing for their system. A more complex explanation is that two processes exist, P and Quadbright, but only P is present as a trait in all humans. When both traits are present in a person, they are in a race, and under good visual conditions, P wins most of the time, although Quadbright is more accurate overall. Under poor viewing conditions Quadbright takes over, if it is present.-->
 
-As the super performers appeared only after block 2, it is possible that these participants simply learned the twelve faces in two blocks of 70ms. This is mainly a weakness in the experimental design. But, this wouldn't explain why it appears only in three individuals and why  so abruptly after two blocks.
+As the super performers appeared only after block 2, it is possible that these participants simply learned the twelve faces in two blocks of 70ms. This is mainly a weakness in the experimental design. But, this wouldn't explain why it appears only in three individuals and why so abruptly after two blocks.
 
-A possible contender for the P process is blob detection, which was discussed above, and given how robust performance is with short exposure, P could be part of the face detection mechanism, which is known to be extremely fast. This would be in contradiction with our general assumption that evolution favors simplicity. 
-However, it is inline with the evolutionary principle of bricolage, in that new functions practically almost arise by modification of existing functions.
-From this perspective, we suppose that P could have emerged as a modification or part of visual face detection. 
-A possible approach to test this hypothesis is to repeat the experiment with upside-down faces, which is known to effectively suppress face detection. 
-This would also suppress P, with negative consequences for people without Quadbright.
+A possible contender for the P process is blob detection, which was discussed above, and given how robust performance is with short exposure, P could be part of the face detection mechanism, which is known to be extremely fast. This would be in contradiction with our general assumption that evolution favors simplicity. However, it is inline with the evolutionary principle of bricolage, in that new functions practically almost arise by modification of existing functions. From this perspective, we suppose that P could have emerged as a modification or part of visual face detection. A possible approach to test this hypothesis is to repeat the experiment with upside-down faces, which is known to effectively suppress face detection. This would also suppress P, with negative consequences for people without Quadbright.
 
-As we have argued, when the white sclera first appeared, it must have hit one something on the receiving end. 
-Possibly, this was the mechanism of face detection, which had much more time to evolve. 
-The early benefits of P may also have involved socialization to some extent, for example, children could have learned P through correlation with other cues, such as facial expression, finger-pointing, or object detection. 
-Recent findings show that human evolution is in full progress \[third upper-arm artery, selection in high altitude\], and it may be that the ability to read glances by Quadbright is in the process to evolve, in the sense that is has not yet reached everybody.
+As we have argued, when the white sclera first appeared, it must have hit one something on the receiving end. Possibly, this was the mechanism of face detection, which had much more time to evolve. The early benefits of P may also have involved socialization to some extent, for example, children could have learned P through correlation with other cues, such as facial expression, finger-pointing, or object detection. Recent findings show that human evolution is in full progress \[third upper-arm artery, selection in high altitude\], and it may be that the ability to read glances by Quadbright is in the process to evolve, in the sense that is has not yet reached everybody.
 
 ### Future research
 

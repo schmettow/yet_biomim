@@ -25,45 +25,60 @@ The aim of this paper is to first test the CEH by construction. If the Quadbrigh
 
 The Cooperative Eye Hypothesis originates in the observation that almost all Greater Ape species have dark scleras, with Homo Sapiens being the one exception (@Kobayashi2001). As a matter of fact, all Great Ape scleras are originally white, but in almost all extant species most of it is occluded by a layer of pigmentation in the conjunctiva (@Mearing2022).
 
-As @Kobayashi2001 note, sustaining pigmentation costs the organism energy. From a biophysical perspective it takes a very precise molecular configuration to produce exact colors. The biosynthetic pathways of melanin are complex and several mutations are known, such as albinism, and bright iris color (Eiberg et al., 2008). Non fatal single-point mutations are possible and could have benefits for the organism. This raises two questions: Why have Great Apes and many other animals evolved dark scleras? And: What made the pigmentation disappear in Homo sapiens?
 
 One explanation is protection against predators. Since the sclera is originally white and pupils are dark, the animal eye is a high-contrast target, that is also rapidly moving in the case of Great Apes. The most common explanation for the evolution of conjunctiva pigmentation is that it establishes camouflage, which is equally selective for predator and prey species.
 
-The Cooperative Eye Hypothesis explains the de-pigmentation of human scleras in conjunction with the hyper-sociality of humans. According to @Kobayashi2001, the human eye may have evolved into a non-verbal communication device, facilitating coordinated group activities, such as hunting. Another aspect of human life that may have benefited from improved gaze signalling is child-rearing. Studies by Farroni et al. have shown that already newborns react to direct gaze and show rudimentary forms of gaze following
+The Cooperative Eye Hypothesis explains the de-pigmentation of human scleras in conjunction with the hyper-sociality of humans. According to @Kobayashi2001, the human eye may have evolved into a  device for signalling eye directions, facilitating shared attention building in coordinated group activities, such as hunting. Another aspect of human life that may have benefited from improved gaze signalling is child-rearing. Studies by Farroni et al. have shown that already newborns react to direct gaze and show rudimentary forms of gaze following (@Farroni2003, @Farroni2007, @Farroni2004, @Farroni2949). This suggests that the ability to read glance directions is an innate cognitive mechanism, which is already functional in early childhood.
 
-### Evolutionary Origins of Gaze Reading
+### Evolutionary origins
 
-Originally, the Cooperative Eye Hypothesis (CEH) by KK is based on one distinguishing, and literally eye-catching, feature of Homo Sapiens anatomy. However, there is no signal without a receiver. For the CEH to be complete, it must explain the receiving mechanism. For the evolution of this mechanism, the two extreme possibilities are that it already existed prior to the de-pigmentation of human eyes, or has evolved as a consequence.
+Originally, the Cooperative Eye Hypothesis (CEH) by KK is based on one distinguishing feature of Homo Sapiens anatomy, the white sclera.
 
-Baron Cohen speculated about the existence of a specialized cognitive component, the eye direction detector (EDD), which is already functional in early childhood, and may even be shared with other species. If this were true, then the evolution of the white sclera most likely followed the evolution of EDD, and took the current form to suit the existing mechanism. The problem with this idea is to explain the evolutionary process leading to the EDD. Such a highly specialized cognitive mechanism can only evolve if there is an immediate reproductive benefit, which is hardly the case with the prevalent pigmented scleras in almost all species.
+As @Kobayashi2001 note, sustaining pigmentation costs the organism energy. The biosynthetic pathways of melanin are complex and several mutations are known, such as albinism, and bright iris color (Eiberg et al., 2008).
+Non-fatal mutations leading to less pigmentation must therefore be  common, which in turn means there must exist constant selection pressure sustaining pigmentation. @Mearing2022 in a re-analysis of anthropoid ape faces found that sclera pigmentation varies with prosociality, social tolerance and conspecific lethal aggression, which supports the camouflage hypothesis of why pigmentation exists, the CEH, as well as the alternative self-domestication hypothesis.
 
-Tracking down the evolutionary origins of cognitive processes, in this case, reading glances, is much more intricate. The best we know comes from a comparative studies with chimpanzees \[REF\], where the participants showed no sign of glance reading, but rather relied on head position. If only we assume that chimpanzees have not lost the ability to read glances since the last common ancestor with HS, the ability to read glances must be unique to Homo Sapiens and has happened in the last two million years.
+However, there is no signal without a receiver. For the CEH to be complete, it must explain the receiving mechanism for eye direction signals. For the evolution of this mechanism, the two extreme possibilities are that it already existed prior to the de-pigmentation of human eyes, and was the reason for the mutation to stay, or has evolved as a consequence of de-pigmentation.
 
-The same evolutionary argument holds if we assume that white scleras took precedence. They must have had an immediate reproductive advantage. However, since pigmentation is an active process, the possibility of a single-point mutation or a genetic drift producing a white sclera is much easier to imagine, then the evolution of a specialized cognitive mechanism.
+Tracking down the evolutionary origins of cognitive processes is intricate. The best we know comes from a comparative studies with chimpanzees \[REF\], where the participants showed no sign of glance reading, but rather relied on head position. Assuming that chimpanzees have not lost the ability to read glances since the last common ancestor with HS, the ability to read glances must be unique to Homo Sapiens and has happened in the last two million years.
 
-A possible middle ground is to assume that the white sclera appeared before the EDD, but had been hitting on something existing, perhaps a precursor to the EDD, or something entirely different. While this would have provided the necessary reproductive benefits, the EDD in its present functional form could have evolved as a consequence of the existence of the signal.
+Baron Cohen speculated about the existence of a specialized cognitive component, the eye direction detector (EDD), which is already functional in early childhood, and may even be shared with other species. If this were true, then the evolution of the white sclera most likely followed the evolution of EDD, and took the current form to suit the existing mechanism. 
+The problem with this idea is to explain the evolutionary process leading to the EDD. 
+Such a highly specialized cognitive mechanism can only evolve if there is an immediate reproductive benefit, which is hardly the case when everybody else is in camouflage.
+
+A possible middle ground is to assume that the white sclera appeared before the EDD, but initialy hit on another existing visual mechanism. Perhaps this was an innate precursor to the EDD, but it could be that early humans had to *learn* reading glance directions. In both scenarios, white scleras could have had an immediate effect on fitness, and the EDD in its present functional form could have evolved when a useful signal already existed.
 
 <!--The remaining question therefore is whether the white sclera of modern humans appeared as a single-point mutation, or by slow genetic drift. Assuming that the receiver mechanism at that time was effective only to a fraction of the current human glance reading performance, the white sclera must have been an effective signal from the start, making a single-point mutation more likely. Perhaps, this was followed by a slow genetic drift on the side of the sender.-->
 
 <!--Many examples exist for Examples for specialized visual processing modes exist, for example in the many ways how male animals perform courtship displays. The human visual system is also specialized to detect certain features, such as faces and primary sexual features. As evolutionary design is inventive only in the sense of re-using existing structures, visual processing modes that appear very specialized have evolved from existing structures and must therefore be very old. As the faces of vertebrates have the same basic structure, there was plenty of time for specialized face recognition mechanisms to evolve, and not just in humans. As the unpigmented human sclera is much younger and may have even have appeared as a sudden mutation, it must have hit on an existing cognitive structure to be effective. -->
 
-### Cognitive mechanisms of glance reading
+### Cognitive mechanisms in eye direction reading
 
-Face detection is probably the first specialized recognition for complex visual pattern to emerge in human ontogenesis. It is known to be extremely fast \[REF\] and robust, even greedy, as is evident by the phenomenon of anthropomorphism \[REF\]. Face detection is doubtlessly a cognitive function shaped by evolution, but there are differences to glance direction reading.
-First of all, almost all vertebrates have faces and several mammals from different branches use facial expressions in social interaction \[REF\] (felidae, canae, apes). Even if this would be a result of convergent evolution, we can assume that face detection has evolved much longer ago than glance direction reading. 
+Before observers can read the eye direction, they first have to find the eyes in a face. Faces are practically universal in vertebrates and several mammals from different branches use facial expressions in social interaction \[REF\] (felidae, canae, apes). Even if this were a result of convergent evolution, we can assume that face detection has evolved much longer ago than glance direction reading.
 
-From a perceptual perspective, a face is a characteristic configuration of low-detail "visual blobs". As the human visual system detects low-frequency features much faster, than fine details, it is easy to see how face detection could become such a feat. However, in the usual range of social distance of 1-2m, the eye region consumes a much smaller visual angle, and the transmitted information is much more delicate, as small movements of the eye ball can change the glance direction by several degrees.
+From eye tracking studies and experiments with inverted faces it is known that face recognition starts with holistic processing, which detects the face as a configuration of eyes, a nose (or snout) and a mouth.
 
-Still, the eye region itself is an important social cue for several mammal species. 
-In dogs, wolves and cats, intensive direct eye-to-eye contact (EEC) is interpreted as a challenge or aggression, whereas in other cases it is a social bonding cue (@Zanoli2021). Also for humans, direct eye contact is a strong cue that activates social pathways in the brain (@Senju2009). An eye-contact detector (ECD) is therefore a possible precursor of the postulated eye-direction detector (EDD).
+Face detection is a first-rank member among the innate pattern recognition mechanisms in humans. It emerges early in human ontogeny (and that of many other species) and processing is extremely efficient and fast. The phenomenon of anthropomorphism, as well as the history of the Smiley faces,  shows that face detection is strongly over-tuned, producing many false alarms.
 
-#### HERE
+In the subsequent phase, the visual system performs a more detailed analysis of the face, which is often referred to as feature-based processing. This phase results in identifying persons, recognizing emotions and possibly also reading eye directions.
 
-Yorzinski et al. (2021, 10.3389/fpsyg.2021.632616) evaluated the glance reading performance in various conditions, including pigmentation of sclera and iris color. The found a strong increase in latency in the combination of pigmented sclera with a dark iris. More interestingly for the quest of the receiving mechanism is that the accuracy was only affected very slightly. Overall, this experiment shows that glance reading is robust under a variety of conditions.
+The eye region is an important social cue in several mammal species. In dogs, wolves and cats making eye contact is interpreted as a challenge or aggression, whereas in other cases it is a social bonding cue (@Zanoli2021, @Humphrey0123).
+Also for humans, direct eye contact is a strong cue that activates social pathways in the brain (@Senju2009). More than passing eye contact is an intense social experiences, causing a colorful set of emotions, such as bliss, joy, anger, fear and shame.
 
-...
 
-As established above, some cognitive structures must have existed on the receiving end, when the white sclera appeared. On the lowest level of visual processing, the human visual system is attracted by high contrast regions, as a strong cue for object boundaries. The white sclera and the dark pupil are optimal cues for edge detection, also because the region is surrounded by low-contrast features. One possibility is therefore, that human glance perception is based on detecting the dark iris and inferring the glance direction from the position of the dark pupil in the white sclera, similar to blob detection algorithms in computer vision \[REF\].
+
+
+
+
+
+
+
+<!--From a perceptual perspective, a face is a characteristic configuration of low-detail "visual blobs". As the human visual system detects low-frequency features much faster, than fine details, it is easy to see how face detection could become such a feat. However, in the usual range of social distance of 1-2m, the eye region consumes a much smaller visual angle, and the transmitted information is much more delicate, as small movements of the eye ball can change the glance direction by several degrees.-->
+
+### Eye direction reading performance
+
+ @Yorzinski2021 evaluated the glance reading performance in various conditions, including sclera pigmentation and iris color. They found a strong latency increase in the combination of pigmented sclera with a dark iris. Interestingly accuracy was only affected very slightly, which shows that glance reading is robust under a variety of conditions.
+
+As established above, some cognitive structures must have existed on the receiving end, when the white sclera appeared. On the lowest level of visual processing, the human visual system is attracted by high contrast regions, as a strong cue for object boundaries. The white sclera and the dark pupil are optimal cues for edge detection, also because the region is surrounded by low-contrast features and eyebrows, which provide additional cues [REF]. One possibility is therefore, that human glance perception is based on detecting the dark iris and inferring the glance direction from the position of the dark pupil in the white sclera, similar to blob detection algorithms in computer vision \[REF\].
 
 However, another low-level property of visual processing is that the spatial frequencies, such as skull contours are detected earlier in the process than high frequencies of fine features. While it may seem possible that the receiving mechanism detects and tracks the dark pupil by edge detection, this would not explain the speed and robustness of glance reading seen in humans. Also, blob detection can fail when the object is partly occluded or melts with the environment.
 
@@ -79,13 +94,13 @@ In most animals, the visual part of the eye is strongly symmetric and two axis, 
 
 ## Bioconvergent eye tracking
 
-If the eye ball sends such strong signals that humans can still read glance directions in highly degraded images, then it must be possible to build an effective eye tracking device that uses the same information. While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints results in a good model, how human glance reading works.
+If the eye ball sends such strong signals that humans can still read glance directions in highly degraded images (@Yorzinski2021), then it must be possible to build an effective eye tracking device that uses the same information. While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints results in a good model, how human glance reading works.
 
 From the characteristics of human glance reading, the following *bioconvergence requirements* can be derived for the algorithm:
 
 1.  effective in degraded images and from a distance
 2.  universal, requiring only minimal calibration
-3.  be computationally efficient
+3.  computationally efficiency
 
 Most modern eye tracking devices are in so far bio-convergent in that they use cameras and use visual information to predict the glance position. One of the oldest and still very common approaches is to use internal corneal reflections. On early devices the computation was even done with discrete circuits, which made them very fast and efficient. However, corneal reflections are a faint signal which useless over a distance and easily over-ruled by external reflections. This is why the method requires a strong infrared transmitters to create controlled reflections. This is certainly not how humans perceive glance direction. A modern alternative is to use blob detection methods from computer vision. While the pupil is a much larger target than corneal reflections they are computationally more complex and demanding, especially, because of the partial occlusion of the pupil by the eye lids.\
 The initial idea for an algorithm that is robust under visible light, computationally efficient and works well with a degraded image over a distance came from the bi-directional symmetry of the visible eye ball, and the idea of an extremely low resolution camera.
@@ -105,11 +120,12 @@ v
 + \beta_{v,\textrm{SW}} \textrm{Br}_\textrm{SW}
 $$
 
-While this In this implementation, the model is trained on Quadbright data on nine calibration points shown initially to the participants. Before every single trial a quick calibration is performed to compensate for minor drifts by adjusting the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
+In this implementation, the model is trained on Quadbright data on nine calibration points shown initially to the participants. Before every single trial a quick calibration is performed to compensate for minor drifts by adjusting the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
 
 ### YET Zero prototype
 
-Given that QuadBright essentially compresses the input into a four pixel frame, a high resolution camera is not necessary. More important is a small footprint, as it had to be mounted in frontal position. The choice fell on a type of commercially available USB endoscope cameras. These cameras with a diameter of 5.5mm create almost no obstruction when mounted in the visual field and the built-in LED lights provide a stable light source for better accuracy. On the downside these devices deliver a poor resolution of 480x320 and use unspecified electronic components. A simple 3D-printed part was created to be able to glue the camera to a stick, which in turn is connected to a head mount.
+Most important for the physical design is a small footprint of the camera, as it had to be mounted in frontal position. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame.
+The choice fell on a type of commercially available USB endoscope cameras. These cameras with a diameter of 5.5mm create almost no obstruction when mounted in the visual field and the built-in LED lights provide a stable light source for better accuracy. On the downside these devices deliver a poor resolution of 480x320 and use unspecified electronic components. A simple 3D-printed part was created to be able to glue the camera to a stick, which in turn is connected to a head mount.
 
 The YET Zero application was written in Python, using PyGame for the GUI. The regression model was implemented using the scikit-learn library. First the user is asked to adjust the camera position to be approximately centered. An eye detection algorithm with Haar Cascade is used to initialy detect the eye region, however this is a convenience feature in this implementation is not related to the actual eye tracking.
 

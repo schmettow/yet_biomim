@@ -204,13 +204,17 @@ In most animals, the visual part of the eye is strongly symmetric and two axis, 
 
 The first study was conducted to evaluate the accuracy of the QuadBright algorithm. The algorithm was tested on a 36 participants, who were asked to glance at an orange target on a white background, moving in a random pattern between 24 positions in a six-by-four grid.
 
-## Methods
+## Sample
 
-The experiment was carried out with the YET Zero prototype. A headmount was constructed from a headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials per condition. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular standard error of predicted eye movements of the participants.
+Twenty-four participants were recruited using convenience sampling. Participants with any form of sight corrections were excluded from the study.
+
+## Experimental Design
+
+The experiment was carried out with the YET Zero prototype. A headmount was constructed from a headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials per condition. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes and press a button. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular error of estimated eye positions from the true target position.
 
 The original experiment tested three lighting conditions (visible, infrared, no light), as well as consistent/inconsistent screen brightness levels at quick calibration. As expected, inconsistent brightness levels led to a strong decline in accuracy, whereas the light source conditions differed very little. For the analysis here, data from inconsistent background brightness was discarded and the lighting conditions were pooled. Full details of the experiment can be obtained from @Bender2024.
 
-A multi-level linear model was used to analyze the data, with random intercepts for participants and target positions. The dependent variable was the degree error, calculated as the angular distance between the actual target position and the predicted gaze position. The model was fitted using the `lme4` package in R.
+A multilevel linear model was used to analyze the data, with random intercepts for participants and target positions. The dependent variable was the angular error in degrees. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
 
 ```{r echo = F, output = F}
 library(tidyverse)
@@ -453,19 +457,23 @@ In conclusion, eye tracking using the Quadbright algorithm typically produces ac
 
 ## Study 2: Human glance perception with QuadBright information
 
-The second study tested the possibility that human direction reading uses a Quadbright device by a gaze reading experiment, where accuracy was measured in a control condition and in a condition where eye regions were reduced to four brightness levels. To approximate the depth of processing in both conditions, exposure times were varied from 70 milliseconds to one second.
+The second study aimed at the possibility that human direction reading uses a Quadbright device.  A gaze reading experiment was constructed, where accuracy was measured with eye regions reduced to four brightness levels against a control condition. To approximate the depth of processing in both conditions, exposure times were varied from 70 milliseconds to one second.
 
 ### Experimental design
 
-In this experiment, participants see a frontal face glancing at the hours positions on a clock face (@fig-clockface) and are asked to read the correct hour position. The Quadbright condition was created by masking the eyeball region by a two-by-two grid of brightness levels (@fig-X-b). A Python script using the OpenCV library [@opencv-library] was used to automate the task [@Grosserichter2025]. Exposure times varied in five steps (70, 140, 400, 600 and 1000 milliseconds).
+In this experiment, participants see a frontal face glancing at the hours positions on a clock face (@fig-qb-stimuli) and are asked to read the correct hour position. The Quadbright condition was created by masking the eyeball region by a two-by-two grid of brightness levels. A Python script using the OpenCV library [@opencv-library] was used to automate the task [@Grosserichter2025]. Exposure times varied in five steps (70, 140, 400, 600 and 1000 milliseconds).
 
 ::: {#fig-qb-stimuli layout-ncol="2"}
 ![Control condition](Illustrations/Exp_Control.png){#fig-qb-control}
 
-![Quadbright condition](Illustrations/Exp_QB.png){#fig-qb-experimental} Example stimuli image with eye direction at 3 o'clock position [@Hoelter2025].
+![Quadbright condition](Illustrations/Exp_QB.png){#fig-qb-experimental}
+Example stimuli image with eye direction at 3 o'clock position [@Hoelter2025, with permission]
+
 :::
 
 ### Sample
+
+A sample of 43 participants was collected via convenience sampling with 20 female, 23 male, 18 to 70 years with an average age of 34.2 years). The study was approved by the Humannities & Social Sciences ethics committee of the University of Twente under the number 250623. All participants provided informed consent prior to participation.
 
 ### Data analysis
 
@@ -712,11 +720,20 @@ The multiple receiver model is also inline with the evolutionary process where a
 
 Interestingly, some participants were not affected by the Quadbright image reduction and by tendency even performed better on a good level. This has two possible explanations: One is that Quadbright processing can be learned, and these individuals somehow have acquired this skill prior to the experiment. Under the multiple receiver hypothesis one can also speculate that these individuals do not possess the foveal receiver, but learned to compensate almost fully using brightness processing.
 
-When @BARONCOHEN1995 postulated an EDD, he argued that gaze reading is not just a utilitarian function for shared attention, but a primary cue for Theory-of-Mind (TM), i.e. the ability to attribute mental states to others. In [@Cohen_autism_spectrum] he proposes a connection between autism spectrum disorders and a dysfunctional TM. If the lack of an EDD is part of this dysfunction, then we would expect diagnosed participant to show equal performance in the conditions of our experiment.
+When @BARONCOHEN1995 postulated an EDD, he argued that gaze reading is not just a utilitarian function for shared attention, but a primary cue for Theory-of-Mind (TM), i.e. the ability to attribute mental states to others. @BaronCohen2000 proposes a connection between autism spectrum disorders and a dysfunctional TM. If the lack of an EDD is part of this dysfunction, then we would expect diagnosed participant to show equal performance in the conditions of our experiment.
 
 ## Limitations
 
-A limitation of the first study is that the YET Zero prototype fixes the camera close to eye, which does not match the conditions of a human observer. However, extreme data reduction of Quadbright input suggests that the algorithm will work for distant images as well. While the Quadbright device is not robust to adverse lighting conditions, this may not limit the conclusions of the study, because humans light adjustment capabilities of the human visual system (and that of many mammalian clades) are superb. A straight-forward technical approximation could be the addition of a few simple brightness sensors, and add these signals as control variables to the linear model. Finally, face detection and object tracking are required to find the eye region in a face. However, these are well-established techniques in computer vision, and the human visual system is extremely good at these tasks.
+
+
+
+<!--
++ The YET Zero prototype fixes the camera close to eye, which does not match the conditions of a human observer. However, extreme data reduction of Quadbright input suggests that the algorithm will work for distant images as well. 
+
++ The Quadbright device is not robust to adverse lighting conditions, whereas human eye reading is robust. As human vision is extremely adaptable to liThis does not limit our conclusions of the study, because humans light adjustment capabilities of the human visual system (and that of many mammalian clades) are superb. 
+A straight-forward technical approximation could be the addition of a few simple brightness sensors, and add these signals as control variables to the linear model. 
+Finally, face detection and object tracking are required to find the eye region in a face. However, these are well-established techniques in computer vision, and the human visual system is extremely good at these tasks.
+-->
 
 <!--In this case, the white sclera must have appeared after the receiver mechanism evolved, as it would not have been useful otherwise. If Quadbright processing is a learned skill, then it could have evolved before the white sclera appeared, but this would require that the human visual system was already capable of reading glance directions from other sources, such as dark pupils in dark irises.-->
 

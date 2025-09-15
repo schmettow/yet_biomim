@@ -2,7 +2,7 @@
 title: "The Receiving End of the Cooperative Eye: a test by construction"
 author: "M Schmettow, C. Willemse, S. Borsci"
 format: docx
-editor: visual
+editor: source
 bibliography: yet_biomim.bib
 csl: apa.csl
 execute:
@@ -267,6 +267,8 @@ FB24 <-
   rename(degree_error = visual_angle_accuracy)
 
 summary(FB24)
+
+save(FB24, file = "FB24.Rda")
 ```
 
 ```{r eval = F, echo = F}
@@ -352,7 +354,8 @@ FB24_1 |>
   geom_histogram() +
   geom_vline(aes(xintercept = median(degree_error), col = "median")) +
   geom_vline(aes(xintercept = mean(degree_error), col = "mean")) +
-  geom_vline(aes(xintercept = quantile(degree_error,.95), col = "95% quant."))
+  geom_vline(aes(xintercept = quantile(degree_error,.95), col = "95% quant.")) +
+  labs(color = "Statistic")
   
 
 ```
@@ -769,9 +772,13 @@ The dominant effect of the Quadbright manipulation is how differently it acts on
 
 Studying how eye direction cues establish shared attention also has impact in at least two modern fields of application. One open problem in transport is how automated vehicles can effectively communicate attention and intentions with human traffic members. For example, making eye contact is often observed in communication between drivers and street-crossing pedestrians. External human-machine interfaces (e-HMI) have been tested for communication on the outside of cars, using text, icons and facial expressions. Understanding the role and processing modes of eye direction reading can be used to design more efficient signals.
 
-Another field of application is the design of artificial faces. In social robotics, robot faces are often designed to be expressive, and the role of glance reading in human-robot interaction is well established. However, designing more human-like eye regions for this purpose may result in an adverse effect known as the Uncanny Valley. Artificial faces that are too human-like, but not quite right, are perceived as creepy. The results of this study suggest that degraded eye regions can convey glance directions, which could facilitate the quality of interactiuon, without falling into the Uncanny Valley.
+Another field of application is the design of artificial faces. In social robotics, robot faces are often designed to be expressive, and the role of glance reading in human-robot interaction is well established. However, designing more human-like eye regions for this purpose may result in an adverse effect known as the Uncanny Valley. Artificial faces that are too human-like, but not quite right, are perceived as creepy. The results of this study suggest that degraded eye regions can convey glance directions, which could facilitate the quality of interaction, without falling into the Uncanny Valley.
 
 Finally, the eye tracker we build to test our ideas about the receiving end has already been used extensively for bachelor-level student projects. With some refinement it could deliver sufficient accuracy for many psychological experiments and applied research studies, with the added benefit of being much easier to replicate for everyone than with using commercial eye tracking devices.
+
+# Conclusion
+
+The Cooperative Eye Hypothesis implies that eyes with a visible white sclera is sending exceptionally clear signals about gaze directions. While previous research made this assumption based on face validity, the successful implementation of the simplistic eye tracking algorithm supports this idea. By showing that humans can read glance directions under Quadbright conditions, but with reduced accuracy, lends support for multi-receiver theories, as well as the cue-before-signal theory of evolutionary origins.
 
 <!--As an example, the large area reflections from the computer screen induced strong offsets in glance directions predicted by the eye tracker, and it can be tested whether similar biases occur in cognitive glance reading. At time of evolution, shiny large surfaces, such as computer screens or sheets of paper were present to a much lesser extent, so we can expect that the cognitive system has not evolved to deal with these situations.-->
 

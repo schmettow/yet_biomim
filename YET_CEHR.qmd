@@ -54,39 +54,41 @@ Given the high frequency of non-lethal pigmentation mutations, it is plausible t
 ### The Eye Direction Detector (EDD)
 
 The existence of a specialized receiver represents a necessary corollary to the CEH. For scleral depigmentation to provide fitness benefits, human cognitive architecture must include mechanisms capable of rapidly and accurately extracting gaze direction from visual input. For @BARONCOHEN1995 eye direction detection (EDD) is a pivotal mechanism in his concept of Theory of Mind, marking it as a primarily social cognitive device.
-
 The existence of specialized neural networks for gaze processing is supported by neuroimaging studies showing that certain brain regions are preferentially activated when individuals view eye regions or interpret gaze direction (@Babinet2021).
 
 This raises the reciprocity conundrum: how could the white sclera produce immediate reproductive benefits? One possibility is that the white sclera encountered a rudimentary precursor of the EDD. As @Laidre2013 points out, it is a common assumption that "many signals have evolved from what once were cues." Alternatively, early humans may have been able to learn to read glance directions, with the white sclera providing a signal clear enough to facilitate this learning process.
 
-For the white sclera to become a cue, it had to had possessed visual properties that made it salient for potential receivers. Indeed, the high contrast between the white sclera and the dark pupil creates a visually striking pattern that naturally draws attention. This salience would have made it easier for early humans to detect and interpret eye movements, even in peripheral vision or at a distance.
+For the white sclera to become a cue, it had to had possessed visual properties that made it salient for potential receivers. Indeed, the high contrast between the white sclera and the dark pupil creates a visually striking pattern that seems to draw "natural" attention. This salience would have made it easier for early humans to detect and interpret eye movements, even in peripheral vision or at a distance.
 
 The salience of a cue in an evolutionary context can be understood in terms of its *computational simplicity*. Under this view, the likelihood that a matching cognitive mechanism already existed depends largely on how complex this mechanism had to be. Consequently, evolutionary novel receiver mechanisms, such as the EDD, are expected to exhibit computational simplicity while maintaining functional efficiency (@Guilford1991).
 
 The simplicity requirement is underlined by the fact that gaze reading emerges in human infants before the visual system has fully developed (@Babinet2021). This suggests that the EDD relies on low-level visual cues that can be processed quickly and efficiently, rather than complex feature extraction or high-resolution image processing.
 
-In our first study, we test the computational simplicity of the white sclera by designing a technical receiver device using minimal input and computational resources, and evaluate its accuracy compared to human gaze reading capabilities.
+However, measuring computational simplicity on biological observations bares the risk of circular reasoning, because ease of processing could be the a consequence of natural selection.
+In our first study, we test computational simplicity of the white sclera by constructing a technical receiver device using minimal sensory and computational resources. If the minimalist *eye tracking* device is accurate enough to provide benefits, an upper limit for computational complexity of the signal can be established.
 
 <!--This timeline implies that the EDD had limited evolutionary time to develop sophisticated computational mechanisms for gaze perception. Given this constraint, we propose that the EDD operates through computationally simple processes, which in turn requires the signal to be computationally simple. This simplicity would have allowed rapid evolution of effective gaze perception within the available timeframe.-->
 
 ### Bio-plausible eye tracking
 
-If the CEH, extended by the receiver mechanism, is correct, the human eye should be computationally simple to read: its morphology and coloration should allow for fast, accurate gaze estimation using only the visual cues available to a human observer. If the human eye is indeed a computationally simple signal, then it should be straightforward to build a technical device that can read eye directions using only visual information and simple data processing methods.
+If the CEH, extended by the receiver mechanism, is correct, the human eye should be computationally simple to read with visual cues available to a human observer.
+Most commercial eye-tracking devices use signals that are not available to the human visual system, such as infrared reflections or magnetic fields (@Singh2012). 
 
-Most commercial eye-tracking devices use signals that are not available to the human visual system, such as infrared reflections or magnetic fields (@Singh2012). The more recent video-oculographic devices instead use visible light cameras (@Zhou2004) and recently gave rise to the development of webcam, smartphone and VR eye tracking (@Ciesla2012). Several algorithms have been developed in this line, often making use of advanced machine learning or computer vision techniques (@Krafka2016).
+The more recent video-oculographic devices instead use visible light cameras (@Zhou2004) and recently gave rise to the development of webcam, smartphone and VR eye tracking (@Ciesla2012). Several algorithms have been developed in this line, often making use of advanced machine learning or computer vision techniques (@Krafka2016).
 
-These techniques are computationally complex and demanding, especially with the partial occlusion of the pupil by the eye lids. They also require more advanced processing methods, such as filtering, edge detection or neural networks. These, in turn, are based on iterative optimization methods, which are computing intensive.
+Video-oculographic devices are the only bio-plausible option, because only they work with visible light.  Yet, the typically involved algorithms are computationally complex and demanding, such as filtering, edge detection or neural networks.
+It is known that humans can still read glance directions in highly degraded images (@Yorzinski2021), which suggests that a very low resolution is required, which in turn reduces computational demands. 
 
-If the eye ball sends such easy to decipher signals that humans can still read glance directions in highly degraded images (@Yorzinski2021), then it must be possible to build an eye tracking device that effectively uses purely visual information by rather simple methods of data processing. While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints even results in a good model, how human glance reading works.
+<!--While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints even results in a good model, how human glance reading works.
 
 From the characteristics of human glance reading, the following *bio-plausibility requirements* can be derived for the algorithm:
 
 1.  based on visible light
 2.  based on low-level visual features available in infants
 3.  effective in degraded images and from a distance
-4.  universal, requiring only minimal calibration
+4.  universal, requiring only minimal calibration -->
 
-We introduce the *QuadBright* method to eye tracking, which employs the simple fact that the moving pupil produces a change in *horizontal and vertical brightness distribution*. The most simple approach to capture a bi-directional brightness distribution is to split the image horizontally and vertically in four quadrants (NE, SE, SW and NW, see Fig X) and taking the average brightness (Br). This effectively produces a 4 pixel grayscale image. The four quadrants are used as input for a multiple linear regression model, which predicts the horizontal and vertical position of the eye ball. The following equation shows the model for the horizontal eye position, the vertical position is analog.
+We introduce the *QuadBright* method to eye tracking, which employs the simple fact that the moving pupil produces a change in *horizontal and vertical brightness distribution*. The most simple approach to capture vertical and horizontal is to split the image horizontally and vertically in four quadrants (NE, SE, SW and NW, see Fig X) and taking the average brightness (Br). This effectively produces a 2x2 pixel grayscale image. The four quadrants are used as input for a multiple linear regression model, which predicts the horizontal and vertical position of the eye ball. The following equation shows the model for the horizontal eye position, the vertical position is analog.
 
 $$
 h 
@@ -99,9 +101,9 @@ $$
 
 ### YET Zero prototype
 
-To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). The main design goal was to create a low-cost, easy-to-build device that can be used in various experimental settings.
+To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). 
 
-Most important for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view when it is mounted in frontal position. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone (@fig-yet-zero).
+An important consideration for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view [FIG]. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone (@fig-yet-zero).
 
 The YET Zero application was written in Python, using PyGame for the GUI and basic image processing routines from OpenCV [@opencv-library]. The regression model was implemented using the Scikit-learn library [@scikit-learn]. As usual in eye tracking, a calibration phase trains the model on Quadbright data obtained on (nine) initial calibration points. To account for small deviations between trials, single-point quick calibrations are performed to realign the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
 

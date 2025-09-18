@@ -99,22 +99,6 @@ h
 + \beta_{h,\textrm{SW}} \textrm{Br}_\textrm{SW}
 $$
 
-### YET Zero prototype
-
-To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). 
-
-An important consideration for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view [FIG]. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone (@fig-yet-zero).
-
-The YET Zero application was written in Python, using PyGame for the GUI and basic image processing routines from OpenCV [@opencv-library]. The regression model was implemented using the Scikit-learn library [@scikit-learn]. As usual in eye tracking, a calibration phase trains the model on Quadbright data obtained on (nine) initial calibration points. To account for small deviations between trials, single-point quick calibrations are performed to realign the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
-
-In first tests this system seemed worked well, but it was susceptible to changes in computer screen brightness introduced by the presented stimuli. While the best solution is to use a frontal brightness sensor and extend the model accordingly, as a quick fix the quick calibration was augmented with a highly degraded preview of the next stimulus, just enough to keep the brightness level stable.
-
-::: {#fig-yet-zero layout-ncol="2"}
-![Headmount with camera](Illustrations/YET_Bender_1.png){#fig-headmount}
-
-![In use with headrest](Illustrations/YET_Bender_2.png){#fig-headrest} YET Zero prototype assembled from a USB endoscope camera, a ruler, a headphone and a kitchen roll as headrest [@Bender2024].
-:::
-
 ```{=html}
 <!-- #### SCRATCH
 
@@ -202,21 +186,41 @@ In most animals, the visual part of the eye is strongly symmetric and two axis, 
 #### SCRATCH  -->
 ```
 
-# Study 1: Accuracy of the QuadBright algorithm
+# Study 1: Accuracy of QuadBright eye tracking
 
 The first study was conducted to evaluate the accuracy of the QuadBright algorithm. The algorithm was tested on a 36 participants, who were asked to glance at an orange target on a white background, moving in a random pattern between 24 positions in a six-by-four grid.
 
-## Sample
+## Methods
 
-Twenty-four participants were recruited using convenience sampling. Participants with any form of sight corrections were excluded from the study.
 
-## Experimental Design
+### YET Zero prototype
+
+To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). An important consideration for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view [FIG]. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone (@fig-yet-zero).
+
+The YET Zero application was written in Python, using PyGame for the GUI and basic image processing routines from OpenCV [@opencv-library]. The regression model was implemented using the Scikit-learn library [@scikit-learn]. As usual in eye tracking, a calibration phase trains the model on Quadbright data obtained on (nine) initial calibration points. To account for small deviations between trials, single-point quick calibrations are performed to realign the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
+
+In first tests this system seemed worked well, but it was susceptible to changes in computer screen brightness introduced by the presented stimuli. While the best solution is to use a frontal brightness sensor and extend the model accordingly, as a quick fix the quick calibration was augmented with a highly degraded preview of the next stimulus, just enough to keep the brightness level stable.
+
+::: {#fig-yet-zero layout-ncol="2"}
+![Headmount with camera](Illustrations/YET_Bender_1.png){#fig-headmount}
+
+![In use with headrest](Illustrations/YET_Bender_2.png){#fig-headrest} YET Zero prototype assembled from a USB endoscope camera, a ruler, a headphone and a kitchen roll as headrest [@Bender2024].
+:::
+
+
+### Experimental Design
 
 The experiment was carried out with the YET Zero prototype. A headmount was constructed from a headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials per condition. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes and press a button. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular error of estimated eye positions from the true target position.
 
 The original experiment tested three lighting conditions (visible, infrared, no light), as well as consistent/inconsistent screen brightness levels at quick calibration. As expected, inconsistent brightness levels led to a strong decline in accuracy, whereas the light source conditions differed very little. For the analysis here, data from inconsistent background brightness was discarded and the lighting conditions were pooled. Full details of the experiment can be obtained from @Bender2024.
 
 A multilevel linear model was used to analyze the data, with random intercepts for participants and target positions. The dependent variable was the angular error in degrees. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
+
+### Sample
+
+Twenty-four participants were recruited using convenience sampling. Participants with any form of sight corrections were excluded from the study.
+
+
 
 ```{r echo = F, output = F}
 library(tidyverse)
@@ -284,6 +288,77 @@ FB24 |>
 
 ```
 
+
+## Results
+
+```{r}
+#| output: FALSE
+#| echo: FALSE
+#| 
+library(tidyverse)
+load("FB24.Rda")
+
+FB24_1 <- 
+  FB24 |> 
+    group_by(Part, target_x, target_y, trial) |> 
+    summarize(degree_error = mean(degree_error)) |> 
+    ungroup() |> 
+  bayr::as_tbl_obs()
+
+```
+
+
+
+```{r}
+#| eval: FALSE
+#| echo: FALSE
+summary(FB24$degree_error)
+
+quantile(FB24$degree_error, c(.05, .95))
+
+FB24 |> 
+  group_by(target_x, target_y) |>
+  summarize(mean_degree_error = mean(degree_error), 
+            median_degree_error = median(degree_error)) |> 
+  ungroup() |> 
+  arrange(median_degree_error)
+
+```
+
+The effectiveness of the Quadbright method is measured as degree errors between real target position and measured position. The sample median of degree errors 2.7 degree, with a mean of 3.2 degree. 95 percent of all measurements are below 10.3 degree error. Extreme errors mostly occurred on three (out of 36) participants.
+
+```{r}
+#| output: FALSE
+#| echo: FALSE
+
+FB24_1 |> 
+  group_by(target_x, target_y) |>
+  summarize(mean_degree_error = mean(degree_error), sd_error = sd(degree_error), median = median(degree_error)) |>
+  ungroup()
+```
+
+```{r}
+#| label: fig-sample-degree-error
+#| fig-cap: "Distribution of degree errors across all trials and participants. Vertical lines indicate the mean (green), median (blue) and 95% quantile (red). Note the logarithmic scale on the x-axis." 
+#T_0 <- 
+#  FB24_1 |> 
+#  summarize(mean(degree_error), median(degree_error), quantile(degree_error, .95))
+  
+
+FB24_1 |> 
+  #filter(degree_error < 20) |> 
+  ggplot(aes(x = degree_error)) +
+#    facet_grid(target_y ~ target_x) +
+  scale_x_log10() +
+  geom_histogram(bins = 50) +
+  geom_vline(aes(xintercept = median(degree_error), col = "median")) +
+  geom_vline(aes(xintercept = mean(degree_error), col = "mean")) +
+  geom_vline(aes(xintercept = quantile(degree_error,.95), col = "95% quant.")) +
+  labs(color = "Statistic")
+  
+
+```
+
 ```{r}
 #| label: fig-error-by-target
 #| fig-cap: "Measurement error by target position. Histograms show the distributions of angular errors (in pixel), with a density distribution shown in Red. Blue vertical lines indicate the median accuracy. Note the logarithmic scale on the x-axis."
@@ -306,61 +381,7 @@ FB24 |>
 
 ```
 
-## Results
 
-```{r}
-#| eval: FALSE
-
-summary(FB24$degree_error)
-
-quantile(FB24$degree_error, c(.05, .95))
-
-FB24 |> 
-  group_by(target_x, target_y) |>
-  summarize(mean_degree_error = mean(degree_error), 
-            median_degree_error = median(degree_error)) |> 
-  ungroup() |> 
-  arrange(median_degree_error)
-
-```
-
-The effectiveness of the Quadbright method is measured as degree errors between real target position and measured position. The sample median of degree errors 2.7 degree, with a mean of 3.2 degree. 95 percent of all measurements are below 10.3 degree error. Extreme errors mostly occurred on three (out of 36) participants.
-
-```{r echo=F, output=F}
-FB24_1 <- 
-  FB24 |> 
-    group_by(Part, target_x, target_y, trial) |> 
-    summarize(degree_error = mean(degree_error)) |> 
-    ungroup() |> 
-  bayr::as_tbl_obs()
-
-FB24_1 |> 
-  group_by(target_x, target_y) |>
-  summarize(mean_degree_error = mean(degree_error), sd_error = sd(degree_error), median = median(degree_error)) |> 
-  ungroup()
-```
-
-```{r}
-#| label: fig-sample-degree-error
-#| fig-cap: "Distribution of degree errors across all trials and participants. Vertical lines indicate the mean (green), median (blue) and 95% quantile (red). Note the logarithmic scale on the x-axis." 
-#T_0 <- 
-#  FB24_1 |> 
-#  summarize(mean(degree_error), median(degree_error), quantile(degree_error, .95))
-  
-
-FB24_1 |> 
-  #filter(degree_error < 20) |> 
-  ggplot(aes(x = degree_error)) +
-#    facet_grid(target_y ~ target_x) +
-  scale_x_log10() +
-  geom_histogram() +
-  geom_vline(aes(xintercept = median(degree_error), col = "median")) +
-  geom_vline(aes(xintercept = mean(degree_error), col = "mean")) +
-  geom_vline(aes(xintercept = quantile(degree_error,.95), col = "95% quant.")) +
-  labs(color = "Statistic")
-  
-
-```
 
 ```{r fig.width = 12, fig.height = 10, echo = F}
 
@@ -369,7 +390,8 @@ FB24_1 |>
     #filter(degree_error < 20) |> 
     ggplot(aes(x = degree_error)) +
     facet_grid(target_y ~ target_x) +
-    geom_density()
+    geom_density() +
+    scale_x_log10()
 
 ```
 
@@ -395,6 +417,28 @@ brm(degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  +
 
 save(FB24_2, M_1, file = "M_1.Rda")
 ```
+
+```{r M_1, eval = F}
+options(mc.cores = 8)
+library(brms)
+
+
+FB24_2 <- FB24_1 |> 
+  mutate(target_x2 = target_x^2,
+         target_y2 = target_y^2)
+
+M_2 <- 
+brm(degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  + 
+                            (1 + target_x + target_x2 + target_y + target_y2|Part),
+                  data = FB24_2,
+                  iter = 3000,
+                  warmup = 2000,
+                  family = Gamma(link = "log"),
+                  chains = 8)
+
+save(FB24_2, M_2, file = "M_2.Rda")
+```
+
 
 ```{r}
 #| label: tbl-fixef-M1
@@ -423,7 +467,7 @@ fixef(P_1) |>
 
 The model predicts the degree error in the center of the screen to be 2.3 degree, with a high level of certainty (@tbl-fixef-M1). The square terms for both axis are positive, which means that the error increases towards extreme positions. The linear terms are both negative, which means there is a lateral difference, with the largest error in the lower, mount-side (non-nasal) corner.
 
-@fig-predicted-degree-error shows interpolated degree errors per participant. While for all participants the horizontal and vertical errors is lowest near the center region, there appear to be strong individual differences in the curvature. At the same time, there is a surpising lack of crossings between the individual curves, which means that participants with low error in the center region also have low error in extreme positions.
+@fig-predicted-degree-error shows the fitted degree errors per participant. While for all participants the horizontal and vertical errors is lowest near the center region, there appear to be strong individual differences in the curvature. At the same time, there is a surpising lack of crossings between the individual curves, which means that participants with low error in the center region also have low error in extreme positions.
 
 ```{r}
 #| label: fig-predicted-degree-error

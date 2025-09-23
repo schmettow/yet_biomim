@@ -418,25 +418,68 @@ brm(degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  +
 save(FB24_2, M_1, file = "M_1.Rda")
 ```
 
-```{r M_1, eval = F}
+```{r M_2, eval = F}
 options(mc.cores = 8)
 library(brms)
 
 
-FB24_2 <- FB24_1 |> 
+FB24_2 <- FB24 |> 
   mutate(target_x2 = target_x^2,
          target_y2 = target_y^2)
 
+FB24_2 <- FB24 |> 
+  group_by(Part, trial, target_x, target_y) |> 
+  mutate(seq = row_number()%/% 4) |>
+  ungroup() |> 
+  group_by(Part, trial, target_x, target_y, seq) |>
+  summarize(degree_error = mean(degree_error))|>
+  ungroup() 
+
+# |> 
+#   mutate(target_x2 = target_x^2,
+#          target_y2 = target_y^2)
+
+#FB24_2 |> 
+#  group_by(Part, target_x, target_y) |>
+#  summarize(n())
+
+
+# F_2 <- formula("degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  + 
+#                             (1 + target_x + target_x2 + target_y + target_y2|Part)")
+
+F_3 <- formula("degree_error ~ poly(target_x,2) + poly(target_y,2) + 
+                              (poly(target_x,2) + poly(target_y,2)|Part)")
+
 M_2 <- 
-brm(degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  + 
-                            (1 + target_x + target_x2 + target_y + target_y2|Part),
-                  data = FB24_2,
-                  iter = 3000,
-                  warmup = 2000,
-                  family = Gamma(link = "log"),
-                  chains = 8)
+  brm(F_3,
+      data = FB24_2,
+      iter = 4000,
+      warmup = 2000,
+      family = lognormal(),
+      chains = 8,
+      init = 0.1)
 
 save(FB24_2, M_2, file = "M_2.Rda")
+
+# FB24_3 <- FB24_2 |> 
+#   mutate(Target = as.factor(paste(target_x, target_y, sep = "_"))
+# )
+# 
+# M_3 <- 
+# brm(degree_error ~ 1 + (1|Target) + (1|Part),
+#                   data = FB24_3,
+#                   iter = 20000,
+#                   #warmup = 1000,
+#                   #family = Gamma(link = "log"),
+#                   #family = lognormal(),
+#                   chains = 8,
+#                   init = 0.1,
+#                   algorithm = "meanfield",
+#                   tol_rel_obj=0.0000001)
+
+#save(FB24_3, M_3, file = "M_3.Rda")
+
+
 ```
 
 
@@ -445,64 +488,80 @@ save(FB24_2, M_2, file = "M_2.Rda")
 #| tab-cap: "Fixed effects estimates of the multi-level polynomial model. The Intercept represents the point of minimum angular error in screen center (target 0/0). The linear terms indicate the direction of the gradient, whereas the square terms indicate the curvature of the error surface."
  
 
-load("M_1.Rda")
+load("M_2.Rda")
 library(tidyverse)
 library(bayr)
 
-P_1 <- posterior(M_1)
+P_2 <- posterior(M_2)
 
-fixef(P_1) |> 
+T_fixef <- 
+  fixef(P_2) |> 
    mutate(
     fixef = case_when(
-      fixef == "Intercept" ~ "Intercept",
-      fixef == "target_x" ~ "x_linear",
-      fixef == "target_x2" ~ "x_square",
-      fixef == "target_y" ~ "y_linear",
-      fixef == "target_y2" ~ "y_square",
+      fixef == "Intercept"   ~ "Intercept",
+      fixef == "polytarget_x21"    ~ "x_linear",
+      fixef == "polytarget_x22"   ~ "x_square",
+      fixef == "polytarget_y21"    ~ "y_linear",
+      fixef == "polytarget_y22"   ~ "y_square",
       TRUE ~ fixef
     )
   )
 
+T_fixef
 ```
 
-The model predicts the degree error in the center of the screen to be 2.3 degree, with a high level of certainty (@tbl-fixef-M1). The square terms for both axis are positive, which means that the error increases towards extreme positions. The linear terms are both negative, which means there is a lateral difference, with the largest error in the lower, mount-side (non-nasal) corner.
+The model predicts the degree error in the center of the screen to be `r round(T_fixef$center[1],2 )` degree, with a high level of certainty (@tbl-fixef-M1). The square terms for both axis are positive and prominent, which means that the error increases towards extreme positions. The linear terms are both negative, which means that the point of optimal accuracy is not in the center, but slightly up and mount-side, with the largest error in the upper nasal corner.
 
-@fig-predicted-degree-error shows the fitted degree errors per participant. While for all participants the horizontal and vertical errors is lowest near the center region, there appear to be strong individual differences in the curvature. At the same time, there is a surpising lack of crossings between the individual curves, which means that participants with low error in the center region also have low error in extreme positions.
+```{r}
+#| eval: false
+
+PP_2 <- 
+  post_pred(M_2, thin = 1) 
+  
+
+T_0 <- 
+  predict(PP_2) |> 
+  left_join(bayr::as_tbl_obs(FB24_2), by = c("Obs")) |> 
+  rename(mean_degree_error = center)
+
+save(T_0, file = "T_0.Rda")
+```
+
 
 ```{r}
 #| label: fig-predicted-degree-error
 #| fig-cap: "Predicted degree error by target position and participant. Points show center estimate per trial with LOESS lines for interpolation."
 #| fig-subcap: 
-#|   - "Horizontal"
-#|   - "Vertical"
+#|   - "Horizontal error"
+#|   - "Vertical error"
 #| layout-ncol: 2
-PP_1 <- 
-  post_pred(M_1) 
-  
 
-T_0 <- 
-  predict(PP_1) |> 
-  left_join(bayr::as_tbl_obs(FB24_1), by = c("Obs")) |> 
-  rename(mean_degree_error = center)
+load("T_0.Rda")
 
 T_0 |> 
   # group_by(Part, target_x, target_y) |>
   # summarize(degree_error = mean(center)) |> 
   # ungroup() |> 
   ggplot(aes(x = target_x , y = mean_degree_error)) +
-  geom_smooth(aes(group=Part), se = F, method = "lm", formula = y ~ poly(x,2), alpha = .5)
+  geom_smooth(aes(group=Part), se = F, method = "lm", formula = y ~ poly(x,2), alpha = .5) +
+  ylim(0,20)
 
 T_0 |> 
   # group_by(Part, target_x, target_y) |>
   # summarize(degree_error = mean(center)) |> 
   # ungroup() |> 
   ggplot(aes(x = target_y , y = mean_degree_error)) +
-  geom_smooth(aes(group=Part), se = F, method = "lm", formula = y ~ poly(x,2), alpha = .5)
+  geom_smooth(aes(group=Part), se = F, method = "lm", formula = y ~ poly(x,2), alpha = .5) +
+  ylim(0,20)
 
   
 ```
+@fig-predicted-degree-error shows the fitted degree errors per participant. While the curvature is rather similar, there appears to be individual differences in the overall level. In the vast majority of of participants, the error is below 5 degree for most of the range.
+
+### Conclusion
 
 In conclusion, eye tracking using the Quadbright algorithm typically produces accuracy in the range of 2-5 degree error. This is a magnitude above what is achieved by commercial eye tracking devices using corneal reflections (e.g. @Pastel2021), but in the same range as other video-oculographic devices (@Heck2023). In the study of @Gale2000 similar levels of accuracy were observed on participants when they judged glance directions from eye and head positions. Another similarity is the effect of eccentricity on accuracy, which has been observed for human participants by @Loomis2008. Altogether, the Quadbright device qualifies as a candidate model for human eye direction reading.
+
 
 ## Study 2: Human glance perception with QuadBright information
 

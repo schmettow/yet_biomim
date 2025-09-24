@@ -214,15 +214,17 @@ The experiment was carried out with the YET Zero prototype. A headmount was cons
 
 The original experiment tested three lighting conditions (visible, infrared, no light), as well as consistent/inconsistent screen brightness levels at quick calibration. As expected, inconsistent brightness levels led to a strong decline in accuracy, whereas the light source conditions differed very little. For the analysis here, data from inconsistent background brightness was discarded and the lighting conditions were pooled. Full details of the experiment can be obtained from @Bender2024.
 
-A multilevel linear model was used to analyze the data, with random intercepts for participants and target positions. The dependent variable was the angular error in degrees. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
-
 ### Sample
 
 Twenty-four participants were recruited using convenience sampling. Participants with any form of sight corrections were excluded from the study.
 
+### Data Analysis
 
 
-```{r echo = F, output = F}
+```{r}
+#| echo: false
+#| output: false
+#| eval: false
 library(tidyverse)
 load("FB/FB24.rda")
 
@@ -256,86 +258,62 @@ FB24_0 <-
   ungroup() |> 
   mutate(target_x = target_x - 960,
          target_y = target_y - 540) |> 
-  select(Run, Part, Session, trial, start_time, Rep, Target, target_x, target_y, time, BG, x, y, x_pro, y_pro, visual_angle_x:visual_angle_accuracy)
+  select(Run, Part, Session, trial, start_time, Rep, Target, target_x, target_y, time, BG, x, y, x_pro, y_pro, visual_angle_x:visual_angle_accuracy) |> 
+  filter(BG == "White")
 
 summary(FB24_0)
 
-FB24_0 |> 
-  ggplot(aes(x = time, y = visual_angle_accuracy, col = as.factor(Session))) +
-  geom_smooth(se = F) +
-  facet_wrap(~Part) +
-  theme_minimal()
-
-## only using middle second
-FB24 <- 
+## only using the middle two second
+FB24_1 <- 
   FB24_0 |> 
-  filter(BG == "White" & time > 1 & time < 2) |> 
+  filter(time > 0.5 & time < 2.5) |> 
   rename(degree_error = visual_angle_accuracy)
+
+# averaging over four frames
+FB24_2 <- FB24_1 |> 
+  group_by(Part, trial, target_x, target_y) |> 
+  mutate(seq = row_number()%/% 4) |>
+  ungroup() |> 
+  group_by(Part, trial, target_x, target_y, seq) |>
+  summarize(degree_error = mean(degree_error))|>
+  ungroup() 
+
 
 summary(FB24)
 
-save(FB24, file = "FB24.Rda")
+save(FB24, FB24_0, FB24_2, file = "FB24.Rda")
 ```
-
-```{r eval = F, echo = F}
-FB24 |> 
-  summarize(`mean degree error` = mean(degree_error), .by = c("Part", "Session")) |> 
-  ggplot(aes(x = Session, y = `mean degree error`, group = as.factor(Part))) + 
-  geom_line()
-
-
-
-
-```
-
-
-## Results
 
 ```{r}
 #| output: FALSE
 #| echo: FALSE
 #| 
+
 library(tidyverse)
 load("FB24.Rda")
 
-FB24_1 <- 
-  FB24 |> 
-    group_by(Part, target_x, target_y, trial) |> 
-    summarize(degree_error = mean(degree_error)) |> 
-    ungroup() |> 
-  bayr::as_tbl_obs()
-
 ```
 
+The effectiveness of the Quadbright method was measured as degree errors between real target position and measured position.
+From the original experiment only the conditions with a white calibration background was used, resulting in `r nrow(FB24_0)` observations from 24 participants. In order to make this more amenable, the data was reduced by first removing the first and last 500ms and subsequently averaging over four consecutive frames, resulting in `r nrow(FB24_2)` observations.
+A multilevel generalized linear model with a log-normal error distribution and log -ink was then used to analyze the data. The dependent variable was the angular error in degrees. Target x- and y-positions were used as predictors in a second degree polynomial term to account for increasing errors towards the extremes. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
 
 
-```{r}
-#| eval: FALSE
-#| echo: FALSE
-summary(FB24$degree_error)
+## Results
 
-quantile(FB24$degree_error, c(.05, .95))
-
-FB24 |> 
-  group_by(target_x, target_y) |>
-  summarize(mean_degree_error = mean(degree_error), 
-            median_degree_error = median(degree_error)) |> 
-  ungroup() |> 
-  arrange(median_degree_error)
-
-```
-
-The effectiveness of the Quadbright method is measured as degree errors between real target position and measured position. The sample median of degree errors 2.7 degree, with a mean of 3.2 degree. 95 percent of all measurements are below 10.3 degree error. Extreme errors mostly occurred on three (out of 36) participants.
 
 ```{r}
 #| output: FALSE
 #| echo: FALSE
 
-FB24_1 |> 
+FB24_2 |> 
   group_by(target_x, target_y) |>
   summarize(mean_degree_error = mean(degree_error), sd_error = sd(degree_error), median = median(degree_error)) |>
   ungroup()
 ```
+
+@fig-sample-degree-error shows the distribution of degree errors across all trials and participants. The distribution is right-skewed, with a long thin tail of extreme errors. The 95% quantile (red line) indicates that most errors are below `r round(quantile(FB24_2$degree_error, .95), 1)` degree. However, this is not evenly distributed across the field, as the error is lowest in the center region and increasing towards the edges (@fig-error-by-target).
+
 
 ```{r}
 #| label: fig-sample-degree-error
@@ -345,19 +323,22 @@ FB24_1 |>
 #  summarize(mean(degree_error), median(degree_error), quantile(degree_error, .95))
   
 
-FB24_1 |> 
+FB24_2 |> 
   #filter(degree_error < 20) |> 
   ggplot(aes(x = degree_error)) +
 #    facet_grid(target_y ~ target_x) +
-  scale_x_log10() +
+#  scale_x_log10() +
   geom_histogram(bins = 50) +
   geom_vline(aes(xintercept = median(degree_error), col = "median")) +
   geom_vline(aes(xintercept = mean(degree_error), col = "mean")) +
   geom_vline(aes(xintercept = quantile(degree_error,.95), col = "95% quant.")) +
-  labs(color = "Statistic")
+  labs(color = "Statistic") +
+  xlim(0, 40)
   
 
 ```
+
+
 
 ```{r}
 #| label: fig-error-by-target
@@ -365,7 +346,9 @@ FB24_1 |>
 #| fig-width: 8
 #| fig-height: 6 
 #| echo: FALSE
-FB24 |> 
+#| output: false
+
+FB24_2 |> 
   group_by(Part, target_x, target_y) |> 
   summarize(mean_degree_error = mean(degree_error)) |> 
   ungroup() |> 
@@ -381,71 +364,10 @@ FB24 |>
 
 ```
 
-
-
-```{r fig.width = 12, fig.height = 10, echo = F}
-
-
- FB24_1 |> 
-    #filter(degree_error < 20) |> 
-    ggplot(aes(x = degree_error)) +
-    facet_grid(target_y ~ target_x) +
-    geom_density() +
-    scale_x_log10()
-
-```
-
-We ran a polynomial multi-level model with Intercept to map angular errors to target positions. To account for the curvature of measurement error across the screen, we used a second-order polynomial term, where the intercept represents the point of minimum angular error in screen center. To account for individual differences, we included the same term on participant level (random effects).
-
-In the center of the screen the error is xy. Both square terms are positive, which means the error increases towards extreme positions. However, the linear terms are both positive, which means the point of minimum error is xy to the right and xy up from screen center, with quite some uncertainty.
-
-```{r M_1, eval = F}
-options(mc.cores = 8)
-library(brms)
-
-
-FB24_2 <- FB24_1 |> 
-  mutate(target_x2 = target_x^2,
-         target_y2 = target_y^2)
-
-M_1 <- 
-brm(degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  + 
-                            (1 + target_x + target_x2 + target_y + target_y2|Part),
-                  data = FB24_2,
-                  iter = 4000,
-                  chains = 4)
-
-save(FB24_2, M_1, file = "M_1.Rda")
-```
-
 ```{r M_2, eval = F}
-options(mc.cores = 8)
+load("FB24.Rda")
 library(brms)
-
-
-FB24_2 <- FB24 |> 
-  mutate(target_x2 = target_x^2,
-         target_y2 = target_y^2)
-
-FB24_2 <- FB24 |> 
-  group_by(Part, trial, target_x, target_y) |> 
-  mutate(seq = row_number()%/% 4) |>
-  ungroup() |> 
-  group_by(Part, trial, target_x, target_y, seq) |>
-  summarize(degree_error = mean(degree_error))|>
-  ungroup() 
-
-# |> 
-#   mutate(target_x2 = target_x^2,
-#          target_y2 = target_y^2)
-
-#FB24_2 |> 
-#  group_by(Part, target_x, target_y) |>
-#  summarize(n())
-
-
-# F_2 <- formula("degree_error ~ 1 + target_x + target_x2 + target_y + target_y2  + 
-#                             (1 + target_x + target_x2 + target_y + target_y2|Part)")
+options(mc.cores = 8)
 
 F_3 <- formula("degree_error ~ poly(target_x,2) + poly(target_y,2) + 
                               (poly(target_x,2) + poly(target_y,2)|Part)")
@@ -460,25 +382,6 @@ M_2 <-
       init = 0.1)
 
 save(FB24_2, M_2, file = "M_2.Rda")
-
-# FB24_3 <- FB24_2 |> 
-#   mutate(Target = as.factor(paste(target_x, target_y, sep = "_"))
-# )
-# 
-# M_3 <- 
-# brm(degree_error ~ 1 + (1|Target) + (1|Part),
-#                   data = FB24_3,
-#                   iter = 20000,
-#                   #warmup = 1000,
-#                   #family = Gamma(link = "log"),
-#                   #family = lognormal(),
-#                   chains = 8,
-#                   init = 0.1,
-#                   algorithm = "meanfield",
-#                   tol_rel_obj=0.0000001)
-
-#save(FB24_3, M_3, file = "M_3.Rda")
-
 
 ```
 
@@ -516,7 +419,7 @@ The model predicts the degree error in the center of the screen to be `r round(T
 #| eval: false
 
 PP_2 <- 
-  post_pred(M_2, thin = 1) 
+  post_pred(M_2, thin = 10) 
   
 
 T_0 <- 
@@ -589,7 +492,8 @@ The outcome variable is the deviations between true and reported hour positions,
 
 ### Results
 
-```{r eval = F}
+```{r}
+#| eval: false
 library(tidyverse)
 
 JGJH <- 
@@ -609,7 +513,10 @@ save(JGJH, file = "JGJH.Rda")
 
 ```
 
-```{r M_4, eval = F}
+```{r}
+#| label: M4
+#| eval: false
+
 load("JGJH.Rda")
 options(mc.cores = 8)
 library(brms)
@@ -635,6 +542,8 @@ save(JGJH, M_4, M_4_agm, file = "M_4.Rda")
 ```
 
 ```{r}
+#| label: load-M4
+
 library(tidyverse)
 library(printr)
 library(bayr)
@@ -642,7 +551,7 @@ library(bayr)
 load("M_4.Rda")
 
 P_4 <-  posterior(M_4)
-PP_4 <- post_pred(M_4)
+
 
 ```
 
@@ -670,6 +579,9 @@ T_4_fixef
 ```
 
 ```{r}
+#| label: fig-fixef-M4
+#| fig-cap: "Estimated degree error by condition and exposure time with 95% credibility intervals."
+
 M_4_agm |> 
   fixef(mean.func = exp) |> 
   as_tibble() |>
@@ -685,7 +597,7 @@ M_4_agm |>
 
 In @tbl-fixef-M4 the Intercept is the average error in the baseline condition (Control, 70 milliseconds), which is around 16° with moderate certainty. In the control condition, error rates remain stable (99.7%) with 140 ms exposure, but with 400ms and 600ms the error rate drops to around 90% and finally to 81.9%.
 
-In the Quadbright condition with 70 ms exposure, the error is around twice as high compared to the control condition, although with considerable uncertainty. Initially, the expected degree error is around 35°. Different to the control condition, error rates take the first drop at 140ms to around 75%. From that point on, the error rates drop similarly to the control condition.
+In the Quadbright condition with 70 ms exposure, the error is around twice as high compared to the control condition, although with considerable uncertainty. Initially, the expected degree error is around 35°. Different to the control condition, error rates take the first drop at 140ms to around 75%. From that point on, the error rates drop similarly to the control condition (@fig-fixef-M4).
 
 <!--. Table @tbl-ml-M4 shows coefficients on the log scale, together with random effect standard deviations for comparison. The strongest variation on both levels is in the control condition (0.20 and 0.44) at 70ms and the effect of Quadbright. This suggests that performance in both conditions is rather independent. -->
 
@@ -697,14 +609,25 @@ fixef_ml(P_4)
 
 If human eye direction reading is similar to a Quadbright device, we expect that it is a universal trait in the population. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect that can be observed is an enormous variance in the Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms, a third group appears with almost stable performance around 10 degree.
 
-```{r fig.height = 6, fig.width = 8}
-#| label: fig-participant-trajectories
-
+```{r}
+#| label: make-T4
+#| eval: FALSE
 ## Part level
+
+PP_4 <- post_pred(M_4)
 T_4 <- 
   predict(PP_4) |> 
   left_join(JGJH, by = c("Obs"))
+save(T_4, file = "T_4.Rda")
 
+```
+
+
+
+```{r fig.height = 6, fig.width = 8}
+#| label: fig-participant-trajectories
+
+load("T_4.Rda")
 T_4 |> 
   group_by(Block, Part) |>
   summarize(mean_degree_error = mean(center * 30)) |>

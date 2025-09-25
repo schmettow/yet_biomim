@@ -592,12 +592,17 @@ M_4_agm |>
   select(Condition, Exposure, center, lower, upper) |> 
   mutate(Exposure = as.factor(as.numeric(Exposure))) |> 
   ggplot(aes(x = Exposure, y = center, ymin = lower, ymax = upper, col = Condition)) +
-  geom_crossbar()
+  geom_crossbar() +
+  ylab("error (degrees)")
 ```
 
-In @tbl-fixef-M4 the Intercept is the average error in the baseline condition (Control, 70 milliseconds), which is around 16° with moderate certainty. In the control condition, error rates remain stable (99.7%) with 140 ms exposure, but with 400ms and 600ms the error rate drops to around 90% and finally to 81.9%.
+In @tbl-fixef-M4 the average error in the baseline condition (Intercept: Control, 70 milliseconds) is 15.8° with only moderate certainty. The population average in Quadbright is centered at 222%. Whereas uncertainty of this effect is pronounced, even the 2.5% credibility limit marks a substantial increase of error (170.7%).
 
-In the Quadbright condition with 70 ms exposure, the error is around twice as high compared to the control condition, although with considerable uncertainty. Initially, the expected degree error is around 35°. Different to the control condition, error rates take the first drop at 140ms to around 75%. From that point on, the error rates drop similarly to the control condition (@fig-fixef-M4).
+At 140ms error rates remain stable in Control at 140 ms exposure (99.7%), whereas in Quadbright they drop drop to 75.3% relative to Control, with very high certainty that the effect is real (CrI 97.5%: 87.2%). From this point on, the Quadbright error rates follow the same trend as Control, with a constant offset of around 75 - 78% (@fig-fixef-M4).
+
+With 400ms exposure, angular error in Control drops to 90.6% of the baseline, and practically stays there at 600ms. However, this cannot be said with 95% certainty (CrI 95% 100.5% and 100.1%).
+With one second of exposure time, the error in Control drops to 81.9% of the baseline, with considerable uncertainty, but almost certainly real.
+
 
 <!--. Table @tbl-ml-M4 shows coefficients on the log scale, together with random effect standard deviations for comparison. The strongest variation on both levels is in the control condition (0.20 and 0.44) at 70ms and the effect of Quadbright. This suggests that performance in both conditions is rather independent. -->
 
@@ -607,7 +612,7 @@ In the Quadbright condition with 70 ms exposure, the error is around twice as hi
 fixef_ml(P_4)
 ```
 
-If human eye direction reading is similar to a Quadbright device, we expect that it is a universal trait in the population. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect that can be observed is an enormous variance in the Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms, a third group appears with almost stable performance around 10 degree.
+If human eye direction reading is similar to a Quadbright device, we expect that it is a universal trait in the population. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect is an enormous variance in all Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms a third group appears with almost stable performance around 10 degree.
 
 ```{r}
 #| label: make-T4
@@ -628,6 +633,7 @@ save(T_4, file = "T_4.Rda")
 #| label: fig-participant-trajectories
 
 load("T_4.Rda")
+
 T_4 |> 
   group_by(Block, Part) |>
   summarize(mean_degree_error = mean(center * 30)) |>
@@ -636,7 +642,7 @@ T_4 |>
   mutate(mean_degree_error = if_else(mean_degree_error == 0, 0.05, mean_degree_error)) |> 
   ggplot(aes(x = Block, y = mean_degree_error, group = Part, col = Part)) +
   geom_line(alpha = .5) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0)) +
   guides(col="none") #+
   #scale_y_log10()
 
@@ -644,7 +650,7 @@ T_4 |>
     
 ```
 
-A related question is whether the population-level pattern is representative for all displayed eye directions on stimulus level. @fig-stim-trajectories shows that this is not so.
+<!--A related question is whether the population-level pattern is representative for all displayed eye directions on stimulus level. @fig-stim-trajectories shows that this is not so.
 
 ```{r fig.height = 6, fig.width = 8}
 #| label: fig-stim-trajectories
@@ -699,20 +705,22 @@ range_quadbright <-
 
 
 ```
+-->
 
 ## Discussion
 
 ### Evolution of the effective sender
 
-The Cooperative Eye Theory implies that the eyeball is a very effective sender of glance direction signals, as simple receiver mechanisms are more likely to evolve. By construction of the most simple eye tracking device that can come to mind, we tried to establish a new limit on how effective the sender is.
+The Cooperative Eye Theory implies that the eyeball is a very effective sender of glance direction signals, as simple receiver mechanisms are more likely to evolve. By construction of a simple eye tracking device, we tried to establish a limit on how effective the sender is.
+Overall, the Quadbright device showed accuracy in the same range as human observers [@Gale2000]. Also the eccentricity effect is similar. 
 
-Overall, the Quadbright device showed very similar characteristics as human observers. Accuracy is in the same range as observed by @Gale2000, and the effect of eccentricity is also similar. In comparison with any other method of eye tracking the Quadbright device is extremely simple, with a 2x2 array of brightness sensors as input requirements.
+By the method of ordinary least square, all calculations are based on matrix multiplication and have closed solutions, requiring no costly recursive or iterative procedures. Taking measures 
+From a biological perspective, every organism that can sense horizontal and vertical brightness changes, can evolve this function, or certainly acquire it, e.g. by operant learning.
 
-Quadbright is extremely efficient in memory consumption, as it works with four brightness levels, which makes a total of 4 byte in the input buffer. Computationally, Quadbright is extremely efficient, as it uses a linear model with only 12 parameters to calculate eye directions. By the method of minimizing the sum of squares, all calculations in the process have closed solutions, requiring no costly numerical approximations, recursions, or iterative procedures. From a biological perspective, every organism that can sense horizontal and vertical brightness changes, can evolve this function, or acquire it by learning.
+Quadbright is extremely efficient in memory consumption at all steps. The lowest demands are at the input buffer (4 byte) and the highest during the training phase, in which the data buffer holds the coordinates and Quadbright value of nine calibration targets and the covariance matrices for the estimation. In operation, only the current Quadbright value and the four coefficients are needed.
 
-We may not forget here, that the spherical form of eye balls has evolved not for computational reasons, but for the physical requirements of creating a moving, variable-focus optical lens from a sack of pressurized liquid. The second salient cue of eyeballs is the dark iris, which adjusts the opening of the lens under varying light levels. Pigmentation in the iris seems to reduce stray light effects, where internal reflections reduce contrast levels [@Kruijt2011].
-
-
+But, has the eye evolved to be such an effective sender of direction signals? The active process of pigmentation implies that this is not so, rather is the white sclera a default condition that comes with liabilities.
+The spherical form of eye balls has evolved not for signal efficiency, but for the physical requirements of creating a moving, variable-focus lens-sensor system from tissue and a pressurized liquid. Also the contrasting iris exists to adjust the opening of the lens under varying light levels and the dark pigmentation reduces internal reflections, which produce stray light effects, resulting in reduced contrast levels [@Kruijt2011]. For the same reason photographic and astronomical devices systems use black paint or velour tissue.
 
 
 <!--Face detection and tracking, compared to eye tracking, is computationally more complex by a few magnitudes as a technical solution requires advanced machine vision algorithms, such as Haar Cascades and XY object tracking. While computational complexity us universal, face detection on the human side probably had tens of millions of years to evolve, with object tracking being even much older.-->
@@ -740,7 +748,9 @@ We may not forget here, that the spherical form of eye balls has evolved not for
 The simplicity of the Quadbright device supports the idea of sclera camouflage as a default condition among apes, despite the metabolic effort. It is hardly conceivable that apex predators, and in particular big cats, would not evolve the ability to read the eyes of their prey. 
 This ability is not necessarily eye direction reading as observed in humans. Another scenario is that first evolved the ability to detect faces. Animals equipped with face detection and sufficiently large brains are likely to *learn by experience* that brightness changes in the eye region often precedes an escape.
 
-Is the Quadbright algorithm equivalent with human glance reading? Is input organized as an image of four areas and the visual system performs a series of simple linear equations? If Quadbright is a good model of human glance perception, then all humans should be able to read glance directions from brightness four grey areas. 
+Is the Quadbright algorithm equivalent with human glance reading? Is input organized as an image of four areas and the visual system performs a series of simple linear equations? Surprisingly good designs emerge from evolutionary processes, 
+
+If Quadbright is a good model of human glance perception, then all humans should be able to read glance directions from brightness four grey areas.
 Our second study showed that Quadbright degradation led to a strong overall decline in reading performance. Quadbright is definitely not the mechanism that drives modern human eye direction reading.
 
 While most participants were less accurate with degraded images, the majority of the participants was still much beyond guessing. Crucially, the Quadbright degradation makes it almost impossible for any mechanism that goes beyond brightness gradients, such as edge detection. We can conclude that a minimum of two processing modes for eye direction reading exists. The first one is based on brightness gradients with moderate accuracy, and the second one extracts higher-level features for high accuracy.

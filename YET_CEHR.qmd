@@ -56,28 +56,35 @@ Given the high frequency of non-lethal pigmentation mutations, it is plausible t
 The existence of a specialized receiver represents a necessary corollary to the CEH. For scleral depigmentation to provide fitness benefits, human cognitive architecture must include mechanisms capable of rapidly and accurately extracting gaze direction from visual input. For @BARONCOHEN1995 eye direction detection (EDD) is a pivotal mechanism in his concept of Theory of Mind, marking it as a primarily social cognitive device.
 The existence of specialized neural networks for gaze processing is supported by neuroimaging studies showing that certain brain regions are preferentially activated when individuals view eye regions or interpret gaze direction (@Babinet2021).
 
-This raises the reciprocity conundrum: how could the white sclera produce immediate reproductive benefits? One possibility is that the white sclera encountered a rudimentary precursor of the EDD. As @Laidre2013 points out, it is a common assumption that "many signals have evolved from what once were cues." Alternatively, early humans may have been able to learn to read glance directions, with the white sclera providing a signal clear enough to facilitate this learning process.
+It is highly unlikely that such a specialized receiver architecture evolved without there being a sender. In contrast to the sender, it is also unlikely that it evolved as a one-point mutation. A possibility is that the white sclera encountered a rudimentary precursor of the EDD. As @Laidre2013 points out, it is a common assumption that "many signals have evolved from what once were cues." 
 
-For the white sclera to become a cue, it had to had possessed visual properties that made it salient for potential receivers. Indeed, the high contrast between the white sclera and the dark pupil creates a visually striking pattern that seems to draw "natural" attention. This salience would have made it easier for early humans to detect and interpret eye movements, even in peripheral vision or at a distance.
+For the white sclera to become a cue, it had to had possessed visual properties that made it salient for receivers that already existed, which converges with the idea that scleral pigmentation evolved as a camouflage.
+
+Indeed, the high contrast between the white sclera and the dark pupil creates a visually striking pattern that seems to draw "natural" attention. This salience would have made it easier for early humans to detect and interpret eye movements, even in peripheral vision or at a distance.
 
 The salience of a cue in an evolutionary context can be understood in terms of its *computational simplicity*. Under this view, the likelihood that a matching cognitive mechanism already existed depends largely on how complex this mechanism had to be. Consequently, evolutionary novel receiver mechanisms, such as the EDD, are expected to exhibit computational simplicity while maintaining functional efficiency (@Guilford1991).
 
 The simplicity requirement is underlined by the fact that gaze reading emerges in human infants before the visual system has fully developed (@Babinet2021). This suggests that the EDD relies on low-level visual cues that can be processed quickly and efficiently, rather than complex feature extraction or high-resolution image processing.
 
-However, measuring computational simplicity on biological observations bares the risk of circular reasoning, because ease of processing could be the a consequence of natural selection.
+However, measuring computational simplicity on biological observations bares the risk of circular reasoning, because ease of processing is a consequence of natural selection.
 In our first study, we test computational simplicity of the white sclera by constructing a technical receiver device using minimal sensory and computational resources. If the minimalist *eye tracking* device is accurate enough to provide benefits, an upper limit for computational complexity of the signal can be established.
 
 <!--This timeline implies that the EDD had limited evolutionary time to develop sophisticated computational mechanisms for gaze perception. Given this constraint, we propose that the EDD operates through computationally simple processes, which in turn requires the signal to be computationally simple. This simplicity would have allowed rapid evolution of effective gaze perception within the available timeframe.-->
 
-### Bio-plausible eye tracking
+### Minimum-Complexity Eye Tracking
 
 If the CEH, extended by the receiver mechanism, is correct, the human eye should be computationally simple to read with visual cues available to a human observer.
 Most commercial eye-tracking devices use signals that are not available to the human visual system, such as infrared reflections or magnetic fields (@Singh2012). 
 
-The more recent video-oculographic devices instead use visible light cameras (@Zhou2004) and recently gave rise to the development of webcam, smartphone and VR eye tracking (@Ciesla2012). Several algorithms have been developed in this line, often making use of advanced machine learning or computer vision techniques (@Krafka2016).
+The more recent video-oculographic devices instead use visible light cameras (@Zhou2004) and recently gave rise to the development of webcam, smartphone and VR eye tracking (@Ciesla2012). Several algorithms have been developed in this line, often making use of advanced machine learning or computer vision techniques (@Krafka2016), which often resemble biological visual processing (@Kumar2017 CHECK).
+Video-oculographic devices are the only *biologically plausible* option, because only they work with visible light.  Yet, the involved algorithms are computationally complex and demanding, such as filtering, edge detection or neural networks.
 
-Video-oculographic devices are the only bio-plausible option, because only they work with visible light.  Yet, the typically involved algorithms are computationally complex and demanding, such as filtering, edge detection or neural networks.
-It is known that humans can still read glance directions in highly degraded images (@Yorzinski2021), which suggests that a very low resolution is required, which in turn reduces computational demands. 
+As we have established above, the receiver likely is computationally simple, but it must also be robust to resolution and noise constraints, as it is known that humans can still read glance directions in highly degraded images (@Yorzinski2021).
+
+The visual cortex can approximately be modeled as a deep neural network and one strategy to a minimum complexity is to find the smallest network that still performs well. In this study we employed the opposite strategy, starting from the most simple device imagineable. 
+
+<!--it is known that low-level visual features are processed very early in the visual pathway, even before reaching the cortex (@Hubel1962). This suggests that the EDD may rely on low-level visual features that are available even to infants, such as brightness patterns, contrast edges and spatial frequencies.-->
+
 
 <!--While not guaranteed, it is possible that designing an eye tracking algorithm under these constraints even results in a good model, how human glance reading works.
 
@@ -88,7 +95,8 @@ From the characteristics of human glance reading, the following *bio-plausibilit
 3.  effective in degraded images and from a distance
 4.  universal, requiring only minimal calibration -->
 
-We introduce the *QuadBright* method to eye tracking, which employs the simple fact that the moving pupil produces a change in *horizontal and vertical brightness distribution*. The most simple approach to capture vertical and horizontal is to split the image horizontally and vertically in four quadrants (NE, SE, SW and NW, see Fig X) and taking the average brightness (Br). This effectively produces a 2x2 pixel grayscale image. The four quadrants are used as input for a multiple linear regression model, which predicts the horizontal and vertical position of the eye ball. The following equation shows the model for the horizontal eye position, the vertical position is analog.
+We introduce the *QuadBright* method to eye tracking, which employs the simple fact that the moving pupil produces a change in *horizontal and vertical brightness distribution*. We chose the most parsimonous way of capturing horizontal and vertical brightness distribution, by splitting the eye image into four quadrants and taking the average brightness in each quadrant, which effectively is an extreme down-sampling to a 2x2 pixel grayscale image. The four brightness values are then used as input to the linear regression model with quadrants NE, SE, SW and NW as predictors for horizontal positions (vertical positions analog):
+
 
 $$
 h 
@@ -193,13 +201,13 @@ The first study was conducted to evaluate the accuracy of the QuadBright algorit
 ## Methods
 
 
-### YET Zero prototype
+### YET Zero implementation
 
-To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). An important consideration for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view [FIG]. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone (@fig-yet-zero).
+To test the QuadBright algorithm, a simple eye tracking device was constructed, called Yet Zero (YET = Yet is your Eye Tracker). An important consideration for the physical design of the eye tracking device is a small footprint of the camera to minimize obstruction of the field of view [FIG]. In contrast, the resolution of the camera barely matters, as QuadBright essentially compresses the input into a four pixel frame. The choice fell on a commercially available USB endoscope camera with a native resolution of 640x480 at 24Hz refresh rate and an AppoTech AX2311 video controller. With a diameter of 5.5mm this camera creates very little obstruction when mounted in the visual field and the six dimmable LED lights provide a stable light source for better accuracy. A simple 3D-printed socket was created to be able to glue the camera to a stick, which in turn was connected to an improvised head mount, using a headphone  (@fig-yet-zero).
 
-The YET Zero application was written in Python, using PyGame for the GUI and basic image processing routines from OpenCV [@opencv-library]. The regression model was implemented using the Scikit-learn library [@scikit-learn]. As usual in eye tracking, a calibration phase trains the model on Quadbright data obtained on (nine) initial calibration points. To account for small deviations between trials, single-point quick calibrations are performed to realign the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
+The YET Zero application was written in Python, using PyGame for the GUI and basic image processing routines from OpenCV [@opencv-library]. The regression model was implemented using the Scikit-learn library [@scikit-learn]. A calibration phase trains the model with data obtained on nine initial calibration points. To account for small shifts between trials, single-point quick calibrations are performed to realign the parameters $\beta_{h,0}$ and $\beta_{v,0}$.
 
-In first tests this system seemed worked well, but it was susceptible to changes in computer screen brightness introduced by the presented stimuli. While the best solution is to use a frontal brightness sensor and extend the model accordingly, as a quick fix the quick calibration was augmented with a highly degraded preview of the next stimulus, just enough to keep the brightness level stable.
+The first iteration of the system was very susceptible to changes in computer screen brightness introduced by the presented stimuli. While the best solution is to use a frontal brightness sensor and extend the model accordingly, as a quick fix the quick calibration was augmented with a highly degraded preview of the next stimulus, just enough to keep the brightness level stable between calibration and trials.
 
 ::: {#fig-yet-zero layout-ncol="2"}
 ![Headmount with camera](Illustrations/YET_Bender_1.png){#fig-headmount}
@@ -210,7 +218,7 @@ In first tests this system seemed worked well, but it was susceptible to changes
 
 ### Experimental Design
 
-The experiment was carried out with the YET Zero prototype. A headmount was constructed from a headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials per condition. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes and press a button. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular error of estimated eye positions from the true target position.
+The experiment was carried out with the YET Zero system A headmount was constructed from a headphone and a kitchen paper roll was used as a chin rest. Participants were seated in 45cm viewing distance using a 16:9 screen with a 41cm diagonal. The experiment consisted of 24 trials per condition. The target moved in a random pattern between 24 positions on the screen. The participants were asked to follow the target with their eyes and press a button. The QuadBright algorithm tracked their eye movements and the accuracy of the algorithm was measured by calculating the angular error of estimated eye positions from the true target position.
 
 The original experiment tested three lighting conditions (visible, infrared, no light), as well as consistent/inconsistent screen brightness levels at quick calibration. As expected, inconsistent brightness levels led to a strong decline in accuracy, whereas the light source conditions differed very little. For the analysis here, data from inconsistent background brightness was discarded and the lighting conditions were pooled. Full details of the experiment can be obtained from @Bender2024.
 
@@ -295,8 +303,8 @@ load("FB24.Rda")
 ```
 
 The effectiveness of the Quadbright method was measured as degree errors between real target position and measured position.
-From the original experiment only the conditions with a white calibration background was used, resulting in `r nrow(FB24_0)` observations from 24 participants. In order to make this more amenable, the data was reduced by first removing the first and last 500ms and subsequently averaging over four consecutive frames, resulting in `r nrow(FB24_2)` observations.
-A multilevel generalized linear model with a log-normal error distribution and log -ink was then used to analyze the data. The dependent variable was the angular error in degrees. Target x- and y-positions were used as predictors in a second degree polynomial term to account for increasing errors towards the extremes. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
+From the original experiment only the conditions with a white calibration background was used, resulting in `r nrow(FB24_0)` observations from 24 participants. In order to remove movement artifacts the first and last 500ms where removed and to make the data set more amenable the average over four consecutive frames was taken, resulting in `r nrow(FB24_2)` observations.
+A multilevel generalized linear model with a log-normal error distribution and log-link was then used to analyze the data. The dependent variable was the angular error in degrees. Target x- and y-positions were used as predictors in a second degree polynomial term to account for increasing errors towards the extremes. The model was fitted using the `brms` package [@brms, version 2.22.0] in R [@Rlang, version 4.5.1].
 
 
 ## Results
@@ -461,14 +469,18 @@ T_0 |>
 ```
 @fig-predicted-degree-error shows the fitted degree errors per participant. While the curvature is rather similar, there appears to be individual differences in the overall level. In the vast majority of of participants, the error is below 5 degree for most of the range.
 
-### Conclusion
+## Conclusion
 
-In conclusion, eye tracking using the Quadbright algorithm typically produces accuracy in the range of 2-5 degree error. This is a magnitude above what is achieved by commercial eye tracking devices using corneal reflections (e.g. @Pastel2021), but in the same range as other video-oculographic devices (@Heck2023). In the study of @Gale2000 similar levels of accuracy were observed on participants when they judged glance directions from eye and head positions. Another similarity is the effect of eccentricity on accuracy, which has been observed for human participants by @Loomis2008. Altogether, the Quadbright device qualifies as a candidate model for human eye direction reading.
+Eye tracking using the Quadbright algorithm typically produces accuracy in the range of 2-5 degree error. This is a magnitude above what is achieved by commercial eye tracking devices using corneal reflections (e.g. @Pastel2021), but in the same range as other video-oculographic devices (@Heck2023). In the study of @Gale2000 similar levels of accuracy were observed on participants when they judged glance directions from eye and head positions. Another similarity is the effect of eccentricity on accuracy, which has been observed for human participants by @Loomis2008. Altogether, the Quadbright device qualifies as a candidate model for human eye direction reading.
 
 
-## Study 2: Human glance perception with QuadBright information
+# Study 2: Human glance perception with QuadBright information
 
-The second study aimed at the possibility that human direction reading uses a Quadbright device.  A gaze reading experiment was constructed, where accuracy was measured with eye regions reduced to four brightness levels against a control condition. To approximate the depth of processing in both conditions, exposure times were varied from 70 milliseconds to one second.
+The second study aimed at the possibility that human direction reading uses a device, operating similöar to Quadbright.  As we have argued in [XREF], two possibilities exist: One receiver exists that existed before the white sclera and has possibly gradually evolved since then. Or a primitive receiver created the initial fitness advantage, on which the evolution of a second, more specialized receiver thrived.
+
+A gaze reading experiment was constructed, where accuracy was measured with eye regions reduced to four brightness levels against a control condition. To approximate the depth of processing in both conditions, exposure times were varied from 70 milliseconds to one second. If humans can read glance directions equally well in both conditions, we can assume that there is only one receiver mechanism, which uses only brightness differences. If participants perform worse in the QuadBright condition, this would suggest that two different mechanisms exist, one using low-level brightness cues, and another more specialized mechanism using high-level features. A problematic outcome of the experiment would be if participants cannot read the Quadbright condition at all. In this case, we have no possibility to decide whether a progenitor receiver exists, or whether this just uses a mechanism yet unknown.
+
+## Methods
 
 ### Experimental design
 
@@ -488,9 +500,10 @@ A sample of 43 participants was collected via convenience sampling with 20 femal
 
 ### Data analysis
 
-The outcome variable is the deviations between true and reported hour positions, resulting in a discrete outcome. A two-factorial linear term with conditional effects for exposure time and QuadBright degradation was used for population-level (fixed effects), as well as on Stimulus and Participant level (random effects). To account for over-dispersion, a negative-binomial outcome distribution with logarithm link function was tried first, but the extremely large reciprocal dispersion parameter suggested that the data is not over-dispersed and the final model was therefore fitted using the Poisson family. All computations were carried out using the Brms package [@brms, version 2.22.0] package in R [@Rlang, version 4.5.1].
+The outcome variable is the deviations between true and reported hour positions, resulting in a discrete outcome. A two-factorial linear term with conditional effects for exposure time and QuadBright degradation was used for population-level (fixed effects), as well as on Stimulus and Participant level (random effects). To account for over-dispersion, a negative-binomial outcome distribution with logarithm link function was tried first, but the extremely large reciprocal dispersion parameter suggested that the data is not over-dispersed and the Poisson family was used. All computations were carried out using the Brms package [@brms, version 2.22.0] package in R [@Rlang, version 4.5.1].
 
 ### Results
+
 
 ```{r}
 #| eval: false
@@ -513,12 +526,17 @@ save(JGJH, file = "JGJH.Rda")
 
 ```
 
+
+
+
+
 ```{r}
 #| label: M4
 #| eval: false
 
 load("JGJH.Rda")
 options(mc.cores = 8)
+library(tidyverse)
 library(brms)
 
 M_4 <- brm(deviation ~ Condition * Exposure + 
@@ -537,7 +555,41 @@ M_4_agm <- brm(deviation ~ 0 + Condition:Exposure +
                   warmup = 3000,
                   chains = 8)
 
-save(JGJH, M_4, M_4_agm, file = "M_4.Rda")
+
+#distinct(JGJH, Exposure, Condition) |> 
+#  write_csv("JGJH_dummy.csv")
+
+T_dummy <- read_csv("JGJH_dummy.csv") |> 
+  mutate(across(stp_1000:qbr_70, ~replace_na(.,0))) |> 
+  mutate(Exposure = as_factor(Exposure))
+D_1 <- left_join(JGJH, T_dummy)
+
+F_stw <- deviation ~ 0 + exp_70 + qbr_70 + 
+                      stp_140 + qbr_140 +
+                      stp_400 + qbr_400 +
+                      stp_600 + qbr_600 +
+                      stp_1000 + qbr_1000 + 
+                    (0 + exp_70 + qbr_70 + 
+                      stp_140 + qbr_140 +
+                      stp_400 + qbr_400 +
+                      stp_600 + qbr_600 +
+                      stp_1000 + qbr_1000| Part)  + 
+                    (0 + exp_70 + qbr_70 + 
+                      stp_140 + qbr_140 +
+                      stp_400 + qbr_400 +
+                      stp_600 + qbr_600 +
+                      stp_1000 + qbr_1000 | Stim)
+
+
+M_4_stw <-brm( F_stw, 
+                  family = poisson(), data = D_1,
+                  iter = 4000,
+                  warmup = 2000,
+                  cores = 8,
+                  chains = 8)
+
+
+save(JGJH, M_4, M_4_agm, M_4_stw, file = "M_4.Rda")
 
 ```
 
@@ -550,7 +602,7 @@ library(bayr)
 
 load("M_4.Rda")
 
-P_4 <-  posterior(M_4)
+P_4 <-  posterior(M_4_stw)
 
 
 ```
@@ -565,10 +617,10 @@ T_4_fixef <-
   select(fixef, center, lower, upper) |> 
   mutate(
     across(c(center, lower, upper),
-           ~ round(if_else(fixef == "Intercept", .x * 30, .x * 100), 1)
+           ~ round(if_else(fixef == "exp_70", .x * 30, .x * 100), 1)
            ),
     across(c(center, lower, upper),
-           ~ if_else(fixef == "Intercept", paste0(.x, "°"), paste0(.x, "%"))
+           ~ if_else(fixef == "exp_70", paste0(.x, "°"), paste0(.x, "%"))
            )
   ) |> 
   mutate(fixef = str_replace_all(fixef, "Exposure", "")) |> 
@@ -596,12 +648,9 @@ M_4_agm |>
   ylab("error (degrees)")
 ```
 
-In @tbl-fixef-M4 the average error in the baseline condition (Intercept: Control, 70 milliseconds) is 15.8° with only moderate certainty. The population average in Quadbright is centered at 222%. Whereas uncertainty of this effect is pronounced, even the 2.5% credibility limit marks a substantial increase of error (170.7%).
+As @fig-fixef-M4 shows the degree error is consistently higher in the Quadbright condition. This is most pronounced at the shortest exposure time of 70 milliseconds, with 16.1° in the control condition, and around double the error in the Quadbright condition [@tbl-fixef-M4]. These estimates are fairly uncertain, but still stand out.
 
-At 140ms error rates remain stable in Control at 140 ms exposure (99.7%), whereas in Quadbright they drop drop to 75.3% relative to Control, with very high certainty that the effect is real (CrI 97.5%: 87.2%). From this point on, the Quadbright error rates follow the same trend as Control, with a constant offset of around 75 - 78% (@fig-fixef-M4).
-
-With 400ms exposure, angular error in Control drops to 90.6% of the baseline, and practically stays there at 600ms. However, this cannot be said with 95% certainty (CrI 95% 100.5% and 100.1%).
-With one second of exposure time, the error in Control drops to 81.9% of the baseline, with considerable uncertainty, but almost certainly real.
+With 140ms the error rate show a conditional  effect, where Control remains stable (98.7%), but Quadbright errors drop to 77.4% relative to Control, with high certainty that the effect is real. From this point on, the Quadbright error rates follow the same trend as Control (@fig-fixef-M4). There seem to be two small decreases towards 400ms (88.9%) and 1000ms (92.3%), but these cannot be said with 95% certainty.
 
 
 <!--. Table @tbl-ml-M4 shows coefficients on the log scale, together with random effect standard deviations for comparison. The strongest variation on both levels is in the control condition (0.20 and 0.44) at 70ms and the effect of Quadbright. This suggests that performance in both conditions is rather independent. -->
@@ -612,7 +661,7 @@ With one second of exposure time, the error in Control drops to 81.9% of the bas
 fixef_ml(P_4)
 ```
 
-If human eye direction reading is similar to a Quadbright device, we expect that it is a universal trait in the population. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. The second dominant effect is an enormous variance in all Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms a third group appears with almost stable performance around 10 degree.
+An implicit assumption is that the receiver mechanism is innate and as such universal in humans. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. A dominant effect is the enormous participant-level variance in all Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms a third group appears with almost stable performance around 10 degree.
 
 ```{r}
 #| label: make-T4
@@ -707,9 +756,9 @@ range_quadbright <-
 ```
 -->
 
-## Discussion
+# Discussion
 
-### Evolution of the effective sender
+## Evolution of the effective sender
 
 The Cooperative Eye Theory implies that the eyeball is a very effective sender of glance direction signals, as simple receiver mechanisms are more likely to evolve. By construction of a simple eye tracking device, we tried to establish a limit on how effective the sender is.
 Overall, the Quadbright device showed accuracy in the same range as human observers [@Gale2000]. Also the eccentricity effect is similar. 
@@ -741,12 +790,12 @@ The spherical form of eye balls has evolved not for signal efficiency, but for t
 
 <!--If it is true that many animals can detect other animals by their eyes, this must either be an evolutionary old function, or by convergent evolution. Reading brightness gradients is an almost universal function in habitats where light exists, and has evolved at least as often as eyes have evolved in the animal kingdom. It is relatively likely that a cognitive mechanism to read glances originates in gradient perception.-->
 
-### Evolution of the receving end
+## Evolution of the receving end
 
 <!-- Maybe there lives, or once lived, a puma which could predict the direction of flight from the brightness distribution monkey eyes. -->
 
-The simplicity of the Quadbright device supports the idea of sclera camouflage as a default condition among apes, despite the metabolic effort. It is hardly conceivable that apex predators, and in particular big cats, would not evolve the ability to read the eyes of their prey. 
-This ability is not necessarily eye direction reading as observed in humans. Another scenario is that first evolved the ability to detect faces. Animals equipped with face detection and sufficiently large brains are likely to *learn by experience* that brightness changes in the eye region often precedes an escape.
+The simplicity of the Quadbright device supports the idea of sclera camouflage as a default condition among apes, despite the metabolic effort. It is hardly conceivable that an apex predators  would not evolve the ability to read the eyes of their prey. 
+Another scenario is that animals equipped with face detection and sufficiently large brains are likely to *learn by experience* that an attempt to flee is often preceded by brightness changes in the eye region.
 
 Is the Quadbright algorithm equivalent with human glance reading? Is input organized as an image of four areas and the visual system performs a series of simple linear equations? Surprisingly good designs emerge from evolutionary processes, 
 
@@ -802,11 +851,11 @@ In the indivisual trajectories, we observed three groups:
 As we have argued, when the white sclera first appeared, it must have hit one something on the receiving end. Possibly, this was the mechanism of face detection, which had much more time to evolve. The early benefits of P may also have involved socialization to some extent, for example, children could have learned P through correlation with other cues, such as facial expression, finger-pointing, or object detection. Recent findings show that human evolution is in full progress \[third upper-arm artery, selection in high altitude\], and it may be that the ability to read glances by Quadbright is in the process to evolve, in the sense that is has not yet reached everybody.-->
 ```
 
-### Future research
+## Future research
 
-Speculating about how receiver mechanisms evolved, and how many there exist is fascinating, but much more research needs to be conducted to make good for the fact that you cannot truly experiment with evolution. The eye tracking device, we developed, can be used to emulate other algorithms, for example using more fine-grained brightness distributions ("Hexabright") or processing geometric cues.
+Speculating about how receiver mechanisms evolved, and how many there exist is fascinating, but  more research needs to be conducted to make good for the fact that we cannot truly experiment with evolution in this case. Still, there are testable hypotheses that can be derived from the current results. In particular, we can make specific predictions about the alleged pregenitor receiver. It may have provided two fitness advantages: providing coarse direction signals in the peripheral field or over a distance, or signalling *change* of glance direction. Both capabilities can be tested experimentally.
 
-The dominant effect of the Quadbright manipulation is how differently it acts on individuals. The divide spans two magnitudes and must therefore have correlates in everyday performance. We would expect that performance in the Quadbright condition is correlated with the ability to read glances under poor conditions, for example with peripheral viewing or when the sender is wearing glasses.
+<!--The dominant effect of the Quadbright manipulation is how differently it acts on individuals. The divide spans two magnitudes and must therefore have correlates in everyday performance. We would expect that performance in the Quadbright condition is correlated with the ability to read glances under poor conditions, for example with peripheral viewing or when the sender is wearing glasses.-->
 
 Studying how eye direction cues establish shared attention also has impact in at least two modern fields of application. One open problem in transport is how automated vehicles can effectively communicate attention and intentions with human traffic members. For example, making eye contact is often observed in communication between drivers and street-crossing pedestrians. External human-machine interfaces (e-HMI) have been tested for communication on the outside of cars, using text, icons and facial expressions. Understanding the role and processing modes of eye direction reading can be used to design more efficient signals.
 
@@ -814,7 +863,7 @@ Another field of application is the design of artificial faces. In social roboti
 
 Finally, the eye tracker we build to test our ideas about the receiving end has already been used extensively for bachelor-level student projects. With some refinement it could deliver sufficient accuracy for many psychological experiments and applied research studies, with the added benefit of being much easier to replicate for everyone than with using commercial eye tracking devices.
 
-# Conclusion
+## Conclusion
 
 The Cooperative Eye Hypothesis implies that eyes with a visible white sclera is sending exceptionally clear signals about gaze directions. While previous research made this assumption based on face validity, the successful implementation of the simplistic eye tracking algorithm supports this idea. By showing that humans can read glance directions under Quadbright conditions, but with reduced accuracy, lends support for multi-receiver theories, as well as the cue-before-signal theory of evolutionary origins.
 

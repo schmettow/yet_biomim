@@ -500,7 +500,9 @@ A sample of 43 participants was collected via convenience sampling with 20 femal
 
 ### Data analysis
 
-The outcome variable is the deviations between true and reported hour positions, resulting in a discrete outcome. A two-factorial linear term with conditional effects for exposure time and QuadBright degradation was used for population-level (fixed effects), as well as on Stimulus and Participant level (random effects). To account for over-dispersion, a negative-binomial outcome distribution with logarithm link function was tried first, but the extremely large reciprocal dispersion parameter suggested that the data is not over-dispersed and the Poisson family was used. All computations were carried out using the Brms package [@brms, version 2.22.0] package in R [@Rlang, version 4.5.1].
+The outcome variable is the deviations between true and reported hour positions, resulting in a discrete outcome. A two-factorial predictor term with conditional effects for exposure time and condition (Control, Quadbright) was used on population-level (fixed effects), as well as on Stimulus and Participant level (random effects). Stairways coding was used on factor Exposure, resulting in coefficients that describe the difference to the previous level.
+
+To account for over-dispersion, a negative-binomial outcome distribution with logarithm link function was tried first, but the extremely large reciprocal dispersion parameter suggested that the data is not over-dispersed and the Poisson family was used. Model selection using Loo information criteria was used to explore alternative models. All computations were carried out using the Brms package [@brms, version 2.22.0] package in R [@Rlang, version 4.5.1].
 
 ### Results
 
@@ -564,17 +566,17 @@ T_dummy <- read_csv("JGJH_dummy.csv") |>
   mutate(Exposure = as_factor(Exposure))
 D_1 <- left_join(JGJH, T_dummy)
 
-F_stw <- deviation ~ 0 + exp_70 + qbr_70 + 
+F_stw <- deviation ~ 0 + control_70 + qbr_70 + 
                       stp_140 + qbr_140 +
                       stp_400 + qbr_400 +
                       stp_600 + qbr_600 +
                       stp_1000 + qbr_1000 + 
-                    (0 + exp_70 + qbr_70 + 
+                    (0 + control_70 + qbr_70 + 
                       stp_140 + qbr_140 +
                       stp_400 + qbr_400 +
                       stp_600 + qbr_600 +
                       stp_1000 + qbr_1000| Part)  + 
-                    (0 + exp_70 + qbr_70 + 
+                    (0 + control_70 + qbr_70 + 
                       stp_140 + qbr_140 +
                       stp_400 + qbr_400 +
                       stp_600 + qbr_600 +
@@ -601,38 +603,11 @@ library(printr)
 library(bayr)
 
 load("M_4.Rda")
-
-P_4 <-  posterior(M_4_stw)
-
-
-```
-
-```{r}
-#| label: tbl-fixef-M4
-#| tab-cap: "Fixed effects estimates of the multi-level Poisson model with 95% credibility limits. The Intercept represents the average degree error in the baseline condition (Control, 70 milliseconds). Remaining coefficients are percentage of change."
-
-T_4_fixef <- 
-  fixef_ml(P_4, mean.func = exp) |> 
-  as_tibble() |>
-  select(fixef, center, lower, upper) |> 
-  mutate(
-    across(c(center, lower, upper),
-           ~ round(if_else(fixef == "exp_70", .x * 30, .x * 100), 1)
-           ),
-    across(c(center, lower, upper),
-           ~ if_else(fixef == "exp_70", paste0(.x, "°"), paste0(.x, "%"))
-           )
-  ) |> 
-  mutate(fixef = str_replace_all(fixef, "Exposure", "")) |> 
-  mutate(fixef = str_replace_all(fixef, "Condition", "")) |> 
-  rename("Population-level effect" = fixef, "2.5% CrI" = lower, "97.5% CrI" = upper)
-
-T_4_fixef
 ```
 
 ```{r}
 #| label: fig-fixef-M4
-#| fig-cap: "Estimated degree error by condition and exposure time with 95% credibility intervals."
+#| fig-cap: "Estimated degree error by condition and exposure time with group-level 95% credibility intervals."
 
 M_4_agm |> 
   fixef(mean.func = exp) |> 
@@ -648,61 +623,212 @@ M_4_agm |>
   ylab("error (degrees)")
 ```
 
-As @fig-fixef-M4 shows the degree error is consistently higher in the Quadbright condition. This is most pronounced at the shortest exposure time of 70 milliseconds, with 16.1° in the control condition, and around double the error in the Quadbright condition [@tbl-fixef-M4]. These estimates are fairly uncertain, but still stand out.
+```{r}
+#| label: fig-grpef-M4
+#| fig-cap: "Variance component analysis on the full conditional model."
 
-With 140ms the error rate show a conditional  effect, where Control remains stable (98.7%), but Quadbright errors drop to 77.4% relative to Control, with high certainty that the effect is real. From this point on, the Quadbright error rates follow the same trend as Control (@fig-fixef-M4). There seem to be two small decreases towards 400ms (88.9%) and 1000ms (92.3%), but these cannot be said with 95% certainty.
+grpef(M_4_stw, mean.func = exp) |> 
+  filter(re_factor == "Part") |> 
+  arrange(desc(center))|> 
+  ggplot(aes(x = fixef, y = center, ymin = lower, ymax = upper)) +
+  geom_crossbar()
+  
+```
+
+```{r}
+#| label: M5
+#| eval: false
+#| 
+library(brms)
+T_dummy <- read_csv("M_5_stw.csv") |> 
+  mutate(across(Control_70:exp_1000, ~replace_na(.,0))) |> 
+  mutate(Exposure = as_factor(Exposure))
+D_2 <- left_join(JGJH, T_dummy)
+
+
+F_stw_2 <- deviation ~ 0 + 
+                      Control_70 + qbr_70 +
+                      exp_140 + qbr_140 +
+                      exp_400 + 
+                      exp_600 + 
+                      exp_1000 +
+                    (0 + 
+                      Control_70 + qbr_70 +
+                      exp_140 + qbr_140 +
+                      exp_400 + 
+                      exp_600 + 
+                      exp_1000|Part) +
+                    (0 + Control_70 + exp_140 + qbr_140| Stim)
+
+summary(glm(F_stw_2, D_2, family = poisson()))
+
+m_5 <- lme4::lmer(F_stw_2, data = D_2)
+exp(summary(m_4)$coefficients)
+
+M_5_stw <-brm( F_stw_2, 
+                  family = poisson(), data = D_2,
+                  iter = 4000,
+                  warmup = 2000,
+                  cores = 8,
+                  chains = 8)
+
+
+save(D_2, M_5_stw, file = "M_5.Rda")
+
+L_4 <- loo(M_4_stw)
+L_5 <- loo(M_5_stw)
+
+list(L_4, L_5) |> bayr::compare_IC()
+
+save(D_2, M_5_stw, L_4, L_5, file = "M_5.Rda")
+
+```
+
+Starting point of the evaluation is a full conditional model, allowing all levels to align freely. @fig-fixef-M4 shows a clear separation between conditions, with consistently better performance in Control. However, starting at 400ms the two conditions seem to run in parallel. A variance component analysis revealed that these levels also explain most of the inter-individual variance.  
+
+Participant-level variance component analysis shows that variation is strongest in the default condition (70ms, control) and the respective conditional effect, but also the conditional effect at 140ms. All other components are negligible. In consequence, a reduced model with conditional effects only for 70ms and 140ms exposure was fitted. Subsequently, LOO IC formally confirmed that the reduced model has superior predictive value ($31985 \lt 32316$).
+
+
+```{r}
+#| label: tbl-fixef-M5
+#| tab-cap: "Fixed effects estimates of a stairways coded multi-level Poisson model with 95% credibility limits. Control_70 represents the average degree error in the baseline condition (Control, 70 milliseconds). Remaining coefficients are change in percentage."
+
+load("M_5.Rda")
+P_5 <- posterior(M_5_stw)
+
+T_5_fixef <- 
+  fixef_ml(P_5, mean.func = exp) |> 
+  as_tibble() |>
+  select(fixef, center, lower, upper) |> 
+  mutate(
+    across(c(center, lower, upper),
+           ~ round(if_else(fixef == "Control_70", .x * 30, .x * 100), 1)
+           ),
+    across(c(center, lower, upper),
+           ~ if_else(fixef == "Control", paste0(.x, "°"), paste0(.x, "%"))
+           )
+  ) |> 
+  #mutate(fixef = str_replace_all(fixef, "Exposure", "")) |> 
+  #mutate(fixef = str_replace_all(fixef, "Condition", "")) |> 
+  mutate(fixef = str_replace(fixef, "exp_70", "ctr_70")) |> 
+  rename("Population-level effect" = fixef, "2.5% CrI" = lower, "97.5% CrI" = upper)
+
+T_5_fixef
+  
+```
+In the default condition (Control, 70ms) the average angular error is 16.9°, with some uncertainty (@tbl-fixef-M5), whereas the Quadbright condition produced error around twice as large. There appears to be a small improvement at 140ms, which is more pronounced for Quadbright (90.3% x 84.6%), but this is far from being certain. At 400ms errors drop to around 92% (conditions combined), which may be a little more or less, but it is credible on 95% level. At 600ms average angular error remains stable, before taking another drop by around 92.9%, which is sufficiently certain.
+
+```{r}
+#| label: tbl-fixef-M4
+#| eval: false
+#| tab-cap: "Fixed effects estimates of a stairways coded multi-level Poisson model with 95% credibility limits. Exp_70 represents the average degree error in the baseline condition (Control, 70 milliseconds). Remaining coefficients are change in percentage."
+
+T_4_fixef <- 
+  fixef_ml(P_4, mean.func = exp) |> 
+  as_tibble() |>
+  select(fixef, center, lower, upper) |> 
+  mutate(
+    across(c(center, lower, upper),
+           ~ round(if_else(fixef == "exp_70", .x * 30, .x * 100), 1)
+           ),
+    across(c(center, lower, upper),
+           ~ if_else(fixef == "exp_70", paste0(.x, "°"), paste0(.x, "%"))
+           )
+  ) |> 
+  #mutate(fixef = str_replace_all(fixef, "Exposure", "")) |> 
+  #mutate(fixef = str_replace_all(fixef, "Condition", "")) |> 
+  mutate(fixef = str_replace(fixef, "exp_70", "ctr_70")) |> 
+  rename("Population-level effect" = fixef, "2.5% CrI" = lower, "97.5% CrI" = upper)
+  
+```
 
 
 <!--. Table @tbl-ml-M4 shows coefficients on the log scale, together with random effect standard deviations for comparison. The strongest variation on both levels is in the control condition (0.20 and 0.44) at 70ms and the effect of Quadbright. This suggests that performance in both conditions is rather independent. -->
 
 ```{r}
-#| eval: FALSE
-#| label: tbl-ml-M4
-fixef_ml(P_4)
+#| eval: false
+#| label: tbl-grpef-M4
+grpef(P_4, mean.func = exp) |> 
+  arrange(desc(center))|> 
+  as_tibble() |> 
+  select(level, grp, grpef, center, lower, upper) |> 
+  mutate(across(c(center, lower, upper), ~ round(.x, 3)))
 ```
 
-An implicit assumption is that the receiver mechanism is innate and as such universal in humans. Figure @fig-participant-trajectories shows the participant-level performance trajectories. Initially, all of them showed lower performance in the Quadbright condition. A dominant effect is the enormous participant-level variance in all Quadbright conditions. Initially, the sample appears to fall into two clusters, one in the region below 40 degree errors, and a few participants dramatically failing with Quadbright signals. Starting with 140ms a third group appears with almost stable performance around 10 degree.
 
 ```{r}
-#| label: make-T4
+#| label: make-T5
 #| eval: FALSE
 ## Part level
 
-PP_4 <- post_pred(M_4)
-T_4 <- 
-  predict(PP_4) |> 
+PP_5 <- post_pred(M_5_stw)
+T_5 <- 
+  predict(PP_5) |> 
   left_join(JGJH, by = c("Obs"))
-save(T_4, file = "T_4.Rda")
+save(T_5, file = "T_5.Rda")
 
 ```
 
 
 
-```{r fig.height = 6, fig.width = 8}
-#| label: fig-participant-trajectories
+```{r fig.height = 10, fig.width = 8}
+#| label: fig-participant-trajectories-1
+#| tab-cap: "Participant-level fitted angular errors."
 
-load("T_4.Rda")
+load("T_5.Rda")
 
-T_4 |> 
-  group_by(Block, Part) |>
-  summarize(mean_degree_error = mean(center * 30)) |>
+T_5 |> 
+  group_by(Exposure, Condition, Part) |>
+  summarize(mean_degree_error = mean(center * 30), .groups = "drop") |>
+  group_by(Part) |> 
+  mutate(part_mean = mean(mean_degree_error)) |>
   ungroup() |> 
-  ## because some are zero
-  mutate(mean_degree_error = if_else(mean_degree_error == 0, 0.05, mean_degree_error)) |> 
-  ggplot(aes(x = Block, y = mean_degree_error, group = Part, col = Part)) +
-  geom_line(alpha = .5) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0)) +
-  guides(col="none") #+
+  mutate(Part = fct_reorder(Part, part_mean)) |>
+  ## because some are zero and we may use a log scale
+  mutate(mean_degree_error = if_else(mean_degree_error == 0, 0.5, mean_degree_error)) |>
+  ggplot(aes(x = Exposure, fill = Condition, y = mean_degree_error)) +
+  facet_wrap(. ~ Part, ncol = 8) +
+  #guides(col="none")  +
+  geom_col(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))# +
   #scale_y_log10()
 
 
     
 ```
 
-<!--A related question is whether the population-level pattern is representative for all displayed eye directions on stimulus level. @fig-stim-trajectories shows that this is not so.
+Figure @fig-participant-trajectories-1 shows the participant-level predicted values. The ability to read glance directions in the control condition is fairly consistent below 10° across participants  and is virtually unaffected by exposure times. There is moderate variation in overall accuracy.
+
+The disadvantage of Quadbright is fully consistent only at 70ms. In contrast, the ability to read Quadbright signals varies dramatically between participants and conditions. Even a group of super-performers exists (first six), where accuracy matches or even exceeds the control condition. This group is also characterized by an enormous difference between 70ms and 400ms, sometimes with an intermediate step at 140ms.
+
+
+
+```{r fig.height = 6, fig.width = 8}
+#| label: fig-participant-trajectories
+
+#load("T_4.Rda")
+
+T_5 |> 
+  group_by(Exposure, Condition, Part) |>
+  summarize(mean_degree_error = mean(center * 30), .groups = "drop") |>
+  ## because some are zero and we may use a log scale
+  #mutate(mean_degree_error = if_else(mean_degree_error == 0, 0.05, mean_degree_error)) |>
+  ggplot(aes(x = Exposure, y = mean_degree_error, group = Part)) +
+  facet_grid(. ~ Condition) +
+  guides(col="none")  +
+  geom_line(alpha = .5) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0)) #+
+  #scale_y_log10()
+
+
+    
+```
+
+<!--A related question is whether the population-level pattern is representative for all displayed eye directions on stimulus level. @fig-stim-trajectories shows that this is not so.-->
 
 ```{r fig.height = 6, fig.width = 8}
 #| label: fig-stim-trajectories
+#| eval: false
 #| echo: FALSE
  
 library(ggrepel)
@@ -724,7 +850,7 @@ T_4 |>
 
 ```{r}
 #| echo: FALSE
-#| eval: TRUE
+#| eval: false
 
 range_control <-
   T_4 |> 
@@ -754,22 +880,33 @@ range_quadbright <-
 
 
 ```
--->
+
 
 # Discussion
 
-## Evolution of the effective sender
+The aim of the studies were to understand better how the signal-receiver system of glance direction reading in humans evolved. We approached this from two sides: First, we tested by construction of the Quadbright device how simple a receiver can be, which has consequences for how it co-evolved with sclera depigmentation. Second, we tested whether human observers possess a mininal receiver similar to Quadbright, or whether a more specialized mechanism exists.
 
-The Cooperative Eye Theory implies that the eyeball is a very effective sender of glance direction signals, as simple receiver mechanisms are more likely to evolve. By construction of a simple eye tracking device, we tried to establish a limit on how effective the sender is.
-Overall, the Quadbright device showed accuracy in the same range as human observers [@Gale2000]. Also the eccentricity effect is similar. 
+The first study aimed at testing the signal efficiency of depigmented eyeballs, as this . The level of accuracy reached with a simple prototype was ample to provide selection pressure under the Cooperative Eye Hypothesis. We will discuss that in more detail.
 
-By the method of ordinary least square, all calculations are based on matrix multiplication and have closed solutions, requiring no costly recursive or iterative procedures. Taking measures 
-From a biological perspective, every organism that can sense horizontal and vertical brightness changes, can evolve this function, or certainly acquire it, e.g. by operant learning.
+The high accuracy even made us wonder whether the receiver in modern humans is similar to a Quadbright device, which gave rise to the second experiment.
+The results of the second experiment clearly show that this is not the case. Another receiver clearly exists, which is quite accurate, makes use of more advanced visual features, is extremely fast and varies little between participants.
+However, participants were still able to extract Quadbright glance directions at a lower accuracy most of the time. This mechanism requires longer exposure and varies dramatically between individuals.
 
-Quadbright is extremely efficient in memory consumption at all steps. The lowest demands are at the input buffer (4 byte) and the highest during the training phase, in which the data buffer holds the coordinates and Quadbright value of nine calibration targets and the covariance matrices for the estimation. In operation, only the current Quadbright value and the four coefficients are needed.
+For theory-forming an important issue to discuss is whether observations in the Quadbright condition justify to speak of a secondary receiver, which operates on brightness levels and could be the progenitor mechanism according to the Cue-before-signal principle.
 
-But, has the eye evolved to be such an effective sender of direction signals? The active process of pigmentation implies that this is not so, rather is the white sclera a default condition that comes with liabilities.
-The spherical form of eye balls has evolved not for signal efficiency, but for the physical requirements of creating a moving, variable-focus lens-sensor system from tissue and a pressurized liquid. Also the contrasting iris exists to adjust the opening of the lens under varying light levels and the dark pigmentation reduces internal reflections, which produce stray light effects, resulting in reduced contrast levels [@Kruijt2011]. For the same reason photographic and astronomical devices systems use black paint or velour tissue.
+## The effective sender
+
+The Cooperative Eye Theory implies that the eyeball is a very effective sender of glance direction signals for two reasons: first, sclera camouflage as a defensive feature can only stabilize as a new feature when there is a detection mechanism to protect against, which again implies a sender. Second, a receiver for cooperative means is more likely to pre-exist or co-evolve, when it is simple.
+
+Overall, the Quadbright device showed good accuracy, in the same range as human observers [@Gale2000].
+A linear decoder—mathematically equivalent to linear regression—operates in 
+$O(d)$ parameter space and performs inference in $O(d)$ time, making it one of the simplest possible mappings from sensory input to behavioral output.
+
+In contrast, signals whose discrimination requires multilayer, nonlinear decoders—such as those analogous to neural networks impose far greater metabolic, developmental, and evolutionary demands on receivers. This difference parallels well-established biological patterns: primitive photoreceptive organisms already exploit brightness gradients and coarse contrast edges as their primary visual features (@AnimalEyes, ch. 2), whereas predators and prey locked in visual arms races often evolve complex, fractal, or high-spatial-frequency patterns that require increasingly sophisticated detection mechanisms (@Stevens2009).
+
+It is important to note that the white sclera never evolved as a signal in vertebrates, but as a protection layer around the lense. Only, when the first vertebrates appeared on land, the sclera evolved into a ball, accommodating for the higher refractive index on the cornea-air surface [@AnimalEyes, ch. 9]. The second defining feature, the dark iris and pupil have likewise evolved for biophysical reasons, as a variable aperture to adjust the incoming light intensity to the dynamic range of the retina [@Kruijt2011].
+
+Still, other features of the human eye morphology may have co-evolved with the receiver mechanism. From a computational perspective, it is surprising that the human eyeball produces highly linear gradients, as spinning spherical objects generally produce sinusoidal signals. It is possible that other features have evolved to improve the linearity of the response, such as the high ratio of exposed sclera [@Kobayashi2001]  or the shape of the eye lids. A testable consequence of this idea is that Quadbright devices are less effective for eye direction reading on other primate species, supposed they had a white sclera.
 
 
 <!--Face detection and tracking, compared to eye tracking, is computationally more complex by a few magnitudes as a technical solution requires advanced machine vision algorithms, such as Haar Cascades and XY object tracking. While computational complexity us universal, face detection on the human side probably had tens of millions of years to evolve, with object tracking being even much older.-->
@@ -792,25 +929,22 @@ The spherical form of eye balls has evolved not for signal efficiency, but for t
 
 ## Evolution of the receving end
 
-<!-- Maybe there lives, or once lived, a puma which could predict the direction of flight from the brightness distribution monkey eyes. -->
+By construction we have shown that a simple linear decoder suffices to read glance directions from depigmented eyeballs with astonishing accuracy. 
+This supports the idea that a primitive receiver could have existed prior to the evolution of white sclera. However, our results clearly show that human eyeball reading is is not a Quadbright device. A more complex receiver exists, which is extremely fast and accurate.
 
-The simplicity of the Quadbright device supports the idea of sclera camouflage as a default condition among apes, despite the metabolic effort. It is hardly conceivable that an apex predators  would not evolve the ability to read the eyes of their prey. 
-Another scenario is that animals equipped with face detection and sufficiently large brains are likely to *learn by experience* that an attempt to flee is often preceded by brightness changes in the eye region.
+While most participants were less accurate with degraded images, the majority of the participants was still much beyond guessing. Importantly, in the Quadbright condition, the rigorous data compression forbids any more advanced receiver gradients to reliably process images. We can assume that performance in the Quadbright condition relies solely on brightness differences.
 
-Is the Quadbright algorithm equivalent with human glance reading? Is input organized as an image of four areas and the visual system performs a series of simple linear equations? Surprisingly good designs emerge from evolutionary processes, 
+We can therefore conclude that a minimum of two receivers exist for eye direction reading. The first one is based on brightness gradients with moderate accuracy, and the second one extracts higher-level features for high accuracy. This idea is inline with a evolutionary process where a rudimentary cue receiver paves the way for the co-evolution of a signal and more advanced receiver. Usually, one would assume that the more advanced receiver evolves from primitive mechanism, effectively replacing it. Here it could be that the primitive receiver is still present, albeit with stark individual performance differences. 
 
-If Quadbright is a good model of human glance perception, then all humans should be able to read glance directions from brightness four grey areas.
-Our second study showed that Quadbright degradation led to a strong overall decline in reading performance. Quadbright is definitely not the mechanism that drives modern human eye direction reading.
+If the Quadbright receiver existed prior to the de-pigmentation event and was just acquiring another function, there is no reason it should vanish when being replaced by the follower. A stronger theory is that both receivers co-exist, as they provide different functions. This has previously been proposed by @Anderson2016, who argue that there may be different mechanisms for precise gaze triangulation and coarse judgement of direction. By using a contrast reversal manipulation they showed that the first depends on geometric cues, whereas the second depends on luminance and motion cues.
 
-While most participants were less accurate with degraded images, the majority of the participants was still much beyond guessing. Crucially, the Quadbright degradation makes it almost impossible for any mechanism that goes beyond brightness gradients, such as edge detection. We can conclude that a minimum of two processing modes for eye direction reading exists. The first one is based on brightness gradients with moderate accuracy, and the second one extracts higher-level features for high accuracy.
+[ventral vs dorsal processing]
 
-A multiple receiver model has been proposed by @Anderson2016, who argue that there may be different mechanisms for precise gaze triangulation and coarse judgement of direction. By using a contrast reversal manipulation they showed that the first depends on geometric cues, whereas the second depends on luminance and motion cues. 
 
-The multiple receiver model is also inline with the evolutionary process where a rudimentary cue receiver paves the way for the co-evolution of signals and more advanced receivers. Brightness gradient processing is not only a good candidate for such a proto-receiver, and there is no reason why this ability should vanish, especially when it still fulfills functions that the more advanced receiver cannot, such as long distance reading and peripheral change detection.
 
-Interestingly, some participants were not affected by the Quadbright image reduction and by tendency even performed better on a good level. This has two possible explanations: One is that Quadbright processing can be learned, and these individuals somehow have acquired this skill prior to the experiment. Under the multiple receiver hypothesis one can also speculate that these individuals do not possess the foveal receiver, but learned to compensate almost fully using brightness processing.
+<!--Interestingly, some participants were not affected by the Quadbright image reduction and by tendency even performed better on a good level. This has two possible explanations: One is that Quadbright processing can be learned, and these individuals somehow have acquired this skill prior to the experiment. Under the multiple receiver hypothesis one can also speculate that these individuals do not possess the foveal receiver, but learned to compensate almost fully using brightness processing.
 
-When @BARONCOHEN1995 postulated an EDD, he argued that gaze reading is not just a utilitarian function for shared attention, but a primary cue for Theory-of-Mind (TM), i.e. the ability to attribute mental states to others. @BaronCohen2000 proposes a connection between autism spectrum disorders and a dysfunctional TM. If the lack of an EDD is part of this dysfunction, then we would expect diagnosed participant to show equal performance in the conditions of our experiment.
+When @BARONCOHEN1995 postulated an EDD, he argued that gaze reading is not just a utilitarian function for shared attention, but a primary cue for Theory-of-Mind (TM), i.e. the ability to attribute mental states to others. @BaronCohen2000 proposes a connection between autism spectrum disorders and a dysfunctional TM. If the lack of an EDD is part of this dysfunction, then we would expect diagnosed participant to show equal performance in the conditions of our experiment.-->
 
 ## Limitations
 

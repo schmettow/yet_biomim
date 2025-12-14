@@ -1,0 +1,11 @@
+Exposure,Condition,Control_70,qbr_70,exp_140,qbr_140,exp_400,exp_600,exp_1000
+70,Quadbright,1,1,,,,,
+70,Control,1,,,,,,
+140,Quadbright,1,1,1,1,,,
+140,Control,1,,1,,,,
+400,Quadbright,1,1,1,1,1,,
+400,Control,1,,1,,1,,
+600,Quadbright,1,1,1,1,1,1,
+600,Control,1,,1,,1,1,
+1000,Quadbright,1,1,1,1,1,1,1
+1000,Control,1,,1,,1,,1

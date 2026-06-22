@@ -1,6 +1,6 @@
 ---
 title: "The Receiving End of the Cooperative Eye: a test by construction"
-author: "M Schmettow, C. Willemse, S. Borsci"
+author: "M Schmettow, _____, S. Borsci"
 format: docx
 editor: source
 bibliography: yet_biomim.bib
@@ -638,8 +638,10 @@ grpef(M_4_stw, mean.func = exp) |>
 ```{r}
 #| label: M5
 #| eval: false
-#| 
+
+library(tidyverse)
 library(brms)
+load("JGJH.Rda")
 T_dummy <- read_csv("M_5_stw.csv") |> 
   mutate(across(Control_70:exp_1000, ~replace_na(.,0))) |> 
   mutate(Exposure = as_factor(Exposure))
@@ -660,17 +662,16 @@ F_stw_2 <- deviation ~ 0 +
                       exp_1000|Part) +
                     (0 + Control_70 + exp_140 + qbr_140| Stim)
 
-summary(glm(F_stw_2, D_2, family = poisson()))
+#m_5 <- lme4::lmer(F_stw_2, data = D_2)
+#exp(summary(m_5)$coefficients)
+#summary(m_5)
 
-m_5 <- lme4::lmer(F_stw_2, data = D_2)
-exp(summary(m_4)$coefficients)
-
-M_5_stw <-brm( F_stw_2, 
+M_5_stw <-rstanarm::stan_glmer( F_stw_2, 
                   family = poisson(), data = D_2,
                   iter = 4000,
                   warmup = 2000,
-                  cores = 8,
-                  chains = 8)
+                  cores = 4,
+                  chains = 4)
 
 
 save(D_2, M_5_stw, file = "M_5.Rda")

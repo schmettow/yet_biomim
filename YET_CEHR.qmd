@@ -1,6 +1,6 @@
 ---
-title: "The Receiving End of the Cooperative Eye: a test by construction"
-author: "M Schmettow, C. Willemse, S. Borsci"
+title: "Cue Before Signal: A Receiver Exaptation Hypothesis for the Evolution of the White Sclera"
+author: "M Schmettow"
 format: docx
 editor: source
 bibliography: yet_biomim.bib
@@ -964,6 +964,11 @@ When @BARONCOHEN1995 postulated an EDD, he argued that gaze reading is not just 
 ```
 
 ## Limitations
+
+A theoretical limitation concerns the assumption, made throughout this argument, that scleral depigmentation reached fixation through strong directed selection rather than genetic drift. An alternative explanation cannot be ruled out on the present evidence: a severe population bottleneck in early human ancestors could, in principle, have fixed a neutral or even mildly deleterious variant purely by chance, independent of any immediate fitness benefit or pre-existing receiver. Genomic evidence has in fact been reported for a severe bottleneck in the hominin lineage, with an effective population size of roughly 1,280 breeding individuals persisting for over 100,000 years around 930,000–813,000 years ago (@Hu2023). Under sufficiently small effective population sizes of this kind, drift can overwhelm weak negative selection entirely (the classical near-neutral threshold, s < 1/4N, becomes easy to satisfy as N shrinks). Under this scenario, the uniform absence of scleral pigmentation variance observed in modern humans (@Mearing2022) would not indicate strong selection at all, but simply the signature of a narrow founding population — and the reciprocity argument developed above, which requires a receiver to already be in place at the moment of fixation, would lose its force. We note, however, that the bottleneck reported by @Hu2023 is itself contested, with subsequent reanalyses questioning whether the signal reflects a genuine demographic event or an artifact of the inference method used [REF]; the evidential basis for the bottleneck alternative is therefore no more secure than that for the directed-selection account it would replace.
+
+We consider this bottleneck account a real possibility that the present argument cannot exclude, and we note that it cannot be adjudicated by behavioural or psychophysical evidence of the kind presented in this paper — only population-genetic analysis, for instance dating the scleral depigmentation event relative to candidate bottleneck episodes and directly estimating effective population size at that time, could distinguish between drift-driven and selection-driven fixation. We would, however, argue that the cue-before-signal account remains the more parsimonious explanation of the two. The bottleneck scenario requires, in addition to a bottleneck of sufficient severity and correct timing, that the depigmentation mutation was neutral or only weakly deleterious, and that this specific combination of circumstances coincided with the mutation's appearance — a conjunction of independent contingencies whose empirical support is, as noted above, itself disputed. The cue-before-signal account requires only the mutation and a pre-existing receiver already documented on independent grounds (§ The Camouflage Hypothesis). On Occam's razor, we therefore retain directed selection as the working assumption of this paper, while flagging it as the single largest unresolved assumption in the argument — one with a direct corollary: if fixation did depend on an immediate selective advantage rather than drift, the ancestral signal itself must have been sufficiently unambiguous to be reliably exploited by the receiver from the outset, since a weak or noisy signal would not have generated the fitness benefit the argument requires.
+
 
 ```{=html}
 <!--

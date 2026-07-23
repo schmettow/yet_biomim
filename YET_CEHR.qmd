@@ -58,6 +58,16 @@ This explanation, however, sits uneasily with the available evidence. If scleral
 
 On these grounds it seems quite likely that the white sclera appeared as a one-point mutation. Nevertheless, to become fixed in the population, it had to confer immediate fitness advantages, which requires an effective receiver mechanism.
 
+### The Camouflage Hypothesis
+
+Before turning to the question of a dedicated receiver for gaze *signalling*, it is worth examining a receiver that the argument so far has left implicit: the receiver presupposed by scleral *camouflage* itself. The camouflage hypothesis holds that pigmented conjunctiva conceals the high-contrast pattern formed by a dark pupil against a white sclera, thereby denying predators, prey, and conspecific rivals a cue to gaze direction and attentional focus (@Kobayashi2001, @Wolf2023). This explanation, near-universal among land vertebrates, is symmetric with the logic developed above for CEH: camouflage against a signal is only under selection if a receiver capable of exploiting that signal already exists. In other words, the camouflage hypothesis is not an alternative to the reciprocity problem — it *is* an instance of it, simply located on the observer's side of a predator-prey or competitive interaction rather than on the side of a cooperating conspecific.
+
+Framed this way, the receiver in question is not a human-specific, gaze-dedicated mechanism at all, but a much more general and phylogenetically ancient one: a bias for detecting high-contrast, eye-like patterns and extracting coarse orientation information from them. This is precisely the kind of pre-existing perceptual bias that receiver psychology identifies as a precondition for signal evolution — new signals routinely evolve by exploiting sensory or cognitive biases that are already present in receivers, for reasons unrelated to the signal itself (@Guilford1991). A substantial body of work on sensory exploitation in sexual selection has documented this pattern directly: novel signals frequently arise by tapping into perceptual biases that evolved under entirely unrelated selection pressures, rather than by co-evolving in step with a matching receiver (@Ryan1990, @EndlerBasolo1998). Because scleral camouflage is selected against essentially this receiver across a wide range of taxa, not only among great apes, its underlying detection mechanism can be assumed to be old, general-purpose, and widely conserved — in sharp contrast to the specialized, human-specific EDD posited by @BARONCOHEN1995.
+
+This reframing has a direct bearing on the reciprocity problem introduced above. Rather than requiring the coincident evolution of a *novel* receiver alongside scleral depigmentation, CEH can instead be understood as a case of receiver co-option: a generic contrast-detection bias, already present and already tuned to exactly this visual pattern through its role in predator and rival vigilance, became available for social exploitation the moment the sclera was no longer hidden. Under this view, the immediate fitness benefit required for fixation (see above) need not stem from a new capacity to *read* gaze direction in any refined sense, but merely from making a pattern that was already reliably detected — for entirely different, agonistic reasons — visible and exploitable in a cooperative context (@Ryan1990).
+
+What such a generic contrast detector plausibly could *not* have provided without further modification is fine-grained directional information — extracting not merely that a salient eye-like pattern is present, but *where* within it the dark pupil sits. This distinction between coarse detection and directional resolution motivates the question addressed in the following section: whether a dedicated Eye Direction Detector had to evolve on top of this ancestral vigilance mechanism, and if so, how large a computational step separates the two.
+
 ### The Eye Direction Detector (EDD)
 
 The existence of a specialized receiver represents a necessary corollary to the CEH. For scleral depigmentation to provide fitness benefits, human cognitive architecture must include mechanisms capable of rapidly and accurately extracting gaze direction from visual input.
@@ -68,7 +78,7 @@ Supporting evidence comes from developmental studies demonstrating that human in
 
 It is almost impossible that such a refined receiver already existed, when the white sclera appeared. And it is also unlikely that it evolved as a one-point mutation. A possibility is that the white sclera encountered a rudimentary precursor of the EDD. As @Laidre2013 points out, it is a common assumption that "many signals have evolved from what once were cues."
 
-## Salience and simplicity 
+### Salience and simplicity 
 
 The high contrast between the white sclera and the dark pupil creates a visually striking pattern that "naturally" draws attention. However, measuring salience by human judgement bares the risk of circular reasoning, because ease of processing is a consequence of the same evolutionary process.
 
